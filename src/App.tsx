@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import confetti from 'canvas-confetti'
+import EntranceScreen from './components/EntranceScreen'
 
 type Page = 'home' | 'points' | 'ai' | 'vr' | 'knowledge' | 'leaderboard'
 
@@ -150,10 +151,28 @@ type ChatMsg = { role: 'user' | 'ai'; text: string; time: string; refDoc?: strin
 // ── Main Shell ──────────────────────────────────────────────────────────────
 
 export default function App() {
-  const [page, setPage] = useState<Page>('points')
+  const [showEntrance, setShowEntrance] = useState(true)
+  const [page, setPage] = useState<Page>('home')
   const [points, setPoints] = useState(8760)
   const [streakDays, setStreakDays] = useState(18)
   const [checkedInToday, setCheckedInToday] = useState(false)
+
+  // Listen to Esc key to return to entrance screen for PPT demonstrations
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !showEntrance) {
+        setShowEntrance(true)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [showEntrance])
+
+  const handleEnterPlatform = () => {
+    setShowEntrance(false)
+    setPage('home')
+    confetti({ particleCount: 90, spread: 80, origin: { y: 0.6 } })
+  }
 
   // Interactive Modals
   const [selectedCourse, setSelectedCourse] = useState<CourseItem | null>(null)
@@ -956,22 +975,36 @@ export default function App() {
   }
 
   return (
-    <div className="flex h-full bg-[#F8F9FB] select-none font-sans">
-      {/* Sidebar matching Figma */}
-      <aside className="w-60 flex flex-col bg-[#0B192C] text-slate-300 shrink-0 justify-between">
-        <div>
-          {/* Logo */}
-          <div className="px-5 py-5 border-b border-slate-800/80">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-[#E60026] text-white flex items-center justify-center font-bold text-sm shadow-md">
-                ✈
+    <>
+      {showEntrance && (
+        <EntranceScreen onEnter={handleEnterPlatform} />
+      )}
+
+      <div className="flex h-full bg-[#F8F9FB] select-none font-sans">
+        {/* Sidebar matching Figma */}
+        <aside className="w-60 flex flex-col bg-[#0B192C] text-slate-300 shrink-0 justify-between">
+          <div>
+            {/* Logo with PPT Return Button */}
+            <div className="px-5 py-5 border-b border-slate-800/80 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-[#E60026] text-white flex items-center justify-center font-bold text-sm shadow-md">
+                  ✈
+                </div>
+                <div>
+                  <p className="font-bold text-white text-sm leading-tight">深圳航空</p>
+                  <p className="text-[10px] text-slate-400">入职培训系统</p>
+                </div>
               </div>
-              <div>
-                <p className="font-bold text-white text-sm leading-tight">深圳航空</p>
-                <p className="text-[10px] text-slate-400">入职培训系统</p>
-              </div>
+
+              <button
+                onClick={() => setShowEntrance(true)}
+                title="返回开场演示页面 (Esc)"
+                className="text-[10px] text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-700 px-2 py-1 rounded transition-colors cursor-pointer flex items-center gap-1 border border-slate-700"
+              >
+                <span>⎋</span>
+                <span>演示</span>
+              </button>
             </div>
-          </div>
 
           {/* Navigation items */}
           <nav className="px-3 py-4 space-y-1.5">
@@ -1159,6 +1192,7 @@ export default function App() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   )
 }
