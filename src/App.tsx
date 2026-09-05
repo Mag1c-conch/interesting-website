@@ -218,7 +218,7 @@ export default function App() {
       <div className="p-8 space-y-7 max-w-6xl mx-auto">
         <div>
           <h1 className="text-2xl font-bold text-[#0B192C]">学习主页</h1>
-          <p className="text-xs text-slate-500 mt-0.5">深圳航空新入职员工综合实训计划与今日学习任务</p>
+          <p className="text-xs text-slate-500 mt-0.5">深圳航空全员数字化业务实训与今日学习任务</p>
         </div>
 
         {/* Hero Card */}
@@ -230,7 +230,7 @@ export default function App() {
                 <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#E60026] text-white">
                   深圳航空 · 数字化培训
                 </span>
-                <span className="text-xs text-slate-300">入职第 18 天</span>
+                <span className="text-xs text-slate-300">持续实训 18 天</span>
               </div>
               <h2 className="text-2xl font-black text-white tracking-wide">
                 欢迎回来，李明杰！
@@ -992,7 +992,7 @@ export default function App() {
                 </div>
                 <div>
                   <p className="font-bold text-white text-sm leading-tight">深圳航空</p>
-                  <p className="text-[10px] text-slate-400">入职培训系统</p>
+                  <p className="text-[10px] text-slate-400">数字化实训平台</p>
                 </div>
               </div>
 
@@ -1058,7 +1058,7 @@ export default function App() {
         <div className="p-4 border-t border-slate-800/80 space-y-3">
           <div>
             <div className="flex items-center justify-between text-[10px] text-slate-400 mb-1 font-medium">
-              <span>入职进度</span>
+              <span>业务实训进度</span>
               <span className="text-slate-300">38%</span>
             </div>
             <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden flex">
@@ -1072,7 +1072,7 @@ export default function App() {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-bold text-white truncate">李明杰</p>
-              <p className="text-[10px] text-slate-400 truncate">ZH · 乘务一队新学员</p>
+              <p className="text-[10px] text-slate-400 truncate">ZH · 客舱服务部</p>
             </div>
           </div>
         </div>
