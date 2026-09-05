@@ -72,77 +72,266 @@ const COURSES: CourseItem[] = [
 interface KnowledgeDoc {
   id: string
   title: string
+  scope: 'general' | 'professional'
+  dept?: string
   cat: string
   time: string
   reads: string
+  desc: string
   badges: { text: string; type: 'official' | 'required' | 'hot' | 'featured' }[]
   content: string
 }
 
 const KNOWLEDGE_DOCS: KnowledgeDoc[] = [
+  // ── 通用知识库 (General Knowledge Base) ───────────────────────────────────
   {
-    id: 'd1',
-    title: '深圳航空服务标准手册 (2024版)',
-    cat: '规章制度',
+    id: 'g1',
+    title: '深圳航空企业文化纲领与全员行为准则 (2026最新版)',
+    scope: 'general',
+    dept: '企业文化部',
+    cat: '企业文化',
     time: '15分钟',
-    reads: '4,320',
-    badges: [{ text: '官方', type: 'official' }, { text: '必读', type: 'required' }],
-    content: '第一章：乘务员仪容仪表与站姿仪态规范\n1.1 妆容要求遵循深航职业形象指引，发网整洁无杂发...\n1.2 登机迎客鞠躬礼仪与问候手势标准...\n第二章：机上餐饮服务动线与防烫伤规范\n2.1 热饮分发温度控制与递送原则...'
+    reads: '6,820',
+    desc: '阐述深航精神“敢为人先、追求卓越”，明确全员安全第一红线与廉洁诚信自律守则。',
+    badges: [{ text: '官方', type: 'official' }, { text: '全员必读', type: 'required' }],
+    content: `【第一章：深圳航空企业核心价值观与发展纲领】
+1.1 企业使命：为旅客创造安全、快捷、准点、舒适的美好出行体验；
+1.2 核心理念：“敢为人先、追求卓越”，弘扬新时代深圳特区拼搏创新精神；
+1.3 安全第一原则：安全是民航的生命线，任何工作安排必须以安全运行为最高前提。
+
+【第二章：全员职业行为与廉洁自律红线】
+2.1 廉洁诚信：杜绝任何利益冲突，严格遵照招采、审批合规纪律；
+2.2 保密义务：严格保护航空器技术资料、旅客隐私数据及未公开商业秘密；
+2.3 职场形象：上班时间规范着装、仪容整洁，践行“任何时候、自然体贴”的深航礼仪。`
   },
   {
-    id: 'd2',
-    title: '民用航空安全法规要点精解',
+    id: 'g2',
+    title: '民用航空安全通用法规与九大职业红线守则',
+    scope: 'general',
+    dept: '航空安全部',
     cat: '安全法规',
     time: '20分钟',
-    reads: '3,180',
-    badges: [{ text: '官方', type: 'official' }, { text: '热门', type: 'hot' }],
-    content: '第一部分：中国民用航空局 CCAR-121 部法规精髓\n针对空勤人员执勤时间限制、机上安保违规行为处置法则...\n第二部分：非法干扰行为处置 SOP\n机组协同配合流程与客舱安全员处突联动机制。'
+    reads: '5,430',
+    desc: '全面解读中国民航 CCAR 体系核心法理，严申全员不可逾越的安全九大红线与隐患自愿报告制度。',
+    badges: [{ text: '官方', type: 'official' }, { text: '全员红线', type: 'required' }],
+    content: `【第一部分：民航安全九大红线通用禁令】
+1. 严禁隐瞒、漏报、迟报飞行与地面安全差错事件；
+2. 严禁无资质操作或超执照权限签署航空器放行及签派文件；
+3. 严禁酒精测试不合格执勤或饮酒后违规进入受限运行区；
+4. 严禁违规带入、遗留外来物(FOD)进入跑道及滑行道。
+
+【第二部分：安全隐患主动自愿报告(吹哨人)制度】
+公司设立全天候匿名安全隐患上报通道，对主动发现并消除重大安全隐患的员工予以重奖并严格免除责任。`
   },
   {
-    id: 'd3',
-    title: '客舱空气质量与健康管理指南',
-    cat: '乘务知识',
-    time: '8分钟',
-    reads: '2,040',
-    badges: [],
-    content: '高空巡航环境座舱增压气压相当于海拔 1800-2400 米高度，湿度通常低于 15%。机组应指导旅客适当饮水，并监控空调环控系统分配情况。'
-  },
-  {
-    id: 'd4',
-    title: '跨文化服务礼仪：国际航线乘客沟通',
-    cat: '服务技能',
+    id: 'g3',
+    title: '深航全员数字化办公协同与网络信息安全规范',
+    scope: 'general',
+    dept: '信息技术部',
+    cat: '通用规范',
     time: '12分钟',
-    reads: '2,870',
-    badges: [{ text: '精选', type: 'featured' }],
-    content: '国际及地区航线中，涉及宗教饮食禁忌、文化手势差异及外语专业服务用语。乘务人员应保持微笑、倾听并准确提供定制化协助。'
+    reads: '3,890',
+    desc: '涵盖移动OA系统安全使用、涉密数据分类分级保护及防范网络钓鱼邮件指南。',
+    badges: [{ text: '官方', type: 'official' }],
+    content: `【第一章：数字化协同系统日常操作】
+1. 办公终端强制开启双因素认证(2FA)与强密码策略；
+2. 严禁将内部涉密公文、航班调度信息上传至未经授权的公有云网盘；
+3. 离岗必须锁屏，定期更新内网杀毒软件病毒库。
+
+【第二章：防范社工欺诈与钓鱼演练】
+收到索要密码、转账通知或异常发票附件的外部邮件，必须点击“一键举报”移交安全中心处置。`
   },
   {
-    id: 'd5',
-    title: '航空气象基础：乘务员须知',
-    cat: '航空知识',
+    id: 'g4',
+    title: '突发公共安全事件全员应急避险与初级急救常识',
+    scope: 'general',
+    dept: '后勤保卫部',
+    cat: '安全防护',
     time: '10分钟',
-    reads: '1,960',
-    badges: [],
-    content: '对流层颠簸与晴空颠簸 (CAT) 的特征分析。听到机长发出“机组请立即就座系好安全带”指令后，乘务员应就近锁定餐车并立刻在最近空座就座。'
+    reads: '4,150',
+    desc: '办公楼宇与场区火灾疏散、地震避险响应，以及常见晕厥、中暑的初期救助与急救热线。',
+    badges: [{ text: '实用', type: 'featured' }],
+    content: `【第一章：楼宇火灾紧急疏散 SOP】
+听到火警广播后，立刻停止作业，沿绿色疏散通道俯身撤离，严禁乘坐电梯；就近按压火警报警器。
+
+【第二章：初级急救响应要领】
+1. 确认现场环境安全，判断倒地人员有无呼吸与颈动脉搏动；
+2. 立即呼叫公司应急值班电话 8888 并拨打 120；
+3. 协助就近取用 AED 自动体外除颤仪，按语音指引贴附电极片。`
   },
   {
-    id: 'd6',
-    title: '机上医疗急救流程与操作规范',
-    cat: '安全培训',
+    id: 'g5',
+    title: '深圳航空品牌视觉识别系统(VI)与对外发声合规指南',
+    scope: 'general',
+    dept: '品牌公关部',
+    cat: '品牌制度',
+    time: '10分钟',
+    reads: '2,980',
+    desc: '企业标识正确应用场景、官方发声口径及社交媒体员工合规规范。',
+    badges: [{ text: '规范', type: 'official' }],
+    content: `【第一章：深圳航空 VI 视觉规范】
+1. 标准色值：深航红 PANTONE 186C (#E60026)，金色 PANTONE 123C (#F59E0B)；
+2. 严禁擅自拉伸、变形标志或反转羽毛图形走向；
+
+【第二章：全员社交媒体发声规范】
+个人社交平台不得发布涉航非公开信息、旅客私密图像或在敏感运行区域违规自拍视频。`
+  },
+  {
+    id: 'g6',
+    title: '员工心理健康调适(EAP)与跨部门高效协同指南',
+    scope: 'general',
+    dept: '人力资源部',
+    cat: '综合素养',
+    time: '8分钟',
+    reads: '3,210',
+    desc: '高强度倒班岗位心理减压技巧、跨部门业务协同礼仪及全天候 EAP 心理援助热线。',
+    badges: [{ text: '精选', type: 'featured' }],
+    content: `【第一部分：倒班与轮休节律心理调适】
+长航线飞行及机坪夜班作业人员需建立科学的光照与睡眠节律，善用4-7-8呼吸法缓解高压紧张。
+
+【第二部分：深航 24 小时 EAP 暖心热线】
+拨打 400-880-9999 获得资深国家级心理咨询师免费专属陪伴与情绪疏导，全程严格加密匿名。`
+  },
+
+  // ── 专业知识库 (Professional / Specialty Knowledge Base) ──────────────────
+  {
+    id: 'p1',
+    title: '客舱乘务员标准操作程序手册 (SOP 2024版)',
+    scope: 'professional',
+    dept: '客舱乘务',
+    cat: '乘务SOP',
     time: '18分钟',
-    reads: '5,610',
-    badges: [{ text: '官方', type: 'official' }, { text: '热门', type: 'hot' }],
-    content: '心脏骤停急救全流程：AED 除颤仪定位与电极片黏贴要领；成人与儿童心肺复苏 (CPR) 按压频率与人工呼吸比例 (30:2)；机上急救药箱开启授权。'
+    reads: '8,920',
+    desc: '覆盖12大客舱服务章节，包含登离机迎客仪态、空中热饮餐食动线、释压处置与紧急撤离口令。',
+    badges: [{ text: '客舱核心', type: 'required' }, { text: '官方', type: 'official' }],
+    content: `【第一章：迎送客仪容与服务动线】
+1. 乘务员登机迎客保持 15° 鞠躬，双手自然交叠于腹前，面带微笑问候；
+2. 餐饮服务推车动线严禁单人越过安全界限，热饮装杯不超过容积 70%，递送时温馨提醒小心烫伤。
+
+【第二章：客舱紧急释压处置】
+氧气面罩脱落后，乘务员立即就近拉下并戴上面罩，坐下并系牢安全带；平稳后携带便携式氧气瓶巡视客舱。`
+  },
+  {
+    id: 'p2',
+    title: '机组晴空颠簸规避决策与机组资源管理(CRM)协同规范',
+    scope: 'professional',
+    dept: '飞行运行',
+    cat: '飞行技术',
+    time: '22分钟',
+    reads: '6,450',
+    desc: '气象雷达回波判读决策、颠簸等级判定话术、单发失效飘降程序与机组协同(CRM)要领。',
+    badges: [{ text: '飞行核心', type: 'required' }, { text: '官方', type: 'official' }],
+    content: `【第一部分：晴空颠簸(CAT)预防与雷达决策】
+巡航阶段监控气压梯度与急流轴交汇区；遭遇中度以上颠簸，机长应立即下达“乘务员就座”指令并开启系好安全带信号灯。
+
+【第二部分：机组资源管理(CRM)沟通准则】
+坚持简短明确的封闭环口令指令（Readback-Hearback），副驾驶对飞行参数偏差享有主动质疑权。`
+  },
+  {
+    id: 'p3',
+    title: '机坪作业安全红线与航空器地面保障标准工作流程',
+    scope: 'professional',
+    dept: '地面服务',
+    cat: '地服运营',
+    time: '16分钟',
+    reads: '4,780',
+    desc: '航空器进出机位指挥引导手势、轮挡反光锥规范摆放、客梯车与登机桥对接防擦碰规程。',
+    badges: [{ text: '地服标准', type: 'official' }],
+    content: `【第一章：航空器机位进出引导】
+指挥员穿戴高可见反光背心，持发光指挥棒站在机长左侧视线前方；飞机停稳发电机停车后方可安放轮挡。
+
+【第二章：客梯车与登机桥靠接规范】
+靠接速度严格控制在 5 km/h 以内，探头微调对准客舱门下沿 5-8cm，确认安全锁扣到位并插好警示链。`
+  },
+  {
+    id: 'p4',
+    title: '民用航空器航线例行维修定检与适航放行技术手册',
+    scope: 'professional',
+    dept: '机务维修',
+    cat: '工程适航',
+    time: '25分钟',
+    reads: '5,310',
+    desc: 'A320/B737航前航后机械定检、MEL最低设备清单核签流程、外表除防冰规范及关键系统参数判读。',
+    badges: [{ text: '机务核心', type: 'hot' }],
+    content: `【第一章：航前定检与绕机检查路线】
+从机头前起落架顺时针环绕机身，重点核查皮托管保护套已拆除、轮胎胎纹及刹车磨损指示销、发动机进气道叶片完好无裂痕。
+
+【第二章：MEL 保留故障签署规范】
+对允许带缺陷飞行的项目，必须由放行工程师核实限定执勤日历天数，并在机组飞行记录本(TLB)明确签署批注。`
+  },
+  {
+    id: 'p5',
+    title: '航空安全员客舱执勤处突与非法干扰应对预案',
+    scope: 'professional',
+    dept: '空防安保',
+    cat: '空防安保',
+    time: '15分钟',
+    reads: '4,620',
+    desc: '非法干扰等级划分、防暴器械使用法定权限、客舱协同处置站位与嫌疑物防爆隔离措施。',
+    badges: [{ text: '安保核心', type: 'required' }],
+    content: `【第一部分：非法干扰等级与处置原则】
+一级扰序（口头挑衅）、二级机闹（推搡破坏）、三级威胁飞行安全（强冲驾驶舱）；保卫人员应果断依法采取约束性措施。
+
+【第二部分：机组空防联动协作】
+安全员与乘务长建立暗语代号确认机制，确保驾驶舱门全程保持电控高强度常闭锁死状态。`
+  },
+  {
+    id: 'p6',
+    title: '航空货运危险品分类鉴别与机下特种配载监管细则',
+    scope: 'professional',
+    dept: '货运物流',
+    cat: '危险品合规',
+    time: '14分钟',
+    reads: '3,410',
+    desc: 'ICAO-DGR危品运输代码判定、超规锂离子电池拦截、货舱装载重量平衡与活动动物恒温运输。',
+    badges: [{ text: '货运法规', type: 'official' }],
+    content: `【第一章：锂电池空运准入限制】
+额定能量大于 160Wh 的锂电池严禁托运及手提；备用电池必须绝缘独立包装；货舱集中装运须提供 UN38.3 鉴定报告。
+
+【第二章：货舱配载重量平衡(W&B)】
+装载前核对装载指令单(LIR)，确保全机重心(CG)严格在包线范围以内，避免起飞尾重或仰角失衡。`
+  },
+  {
+    id: 'p7',
+    title: '复杂气象条件与西南高原航线仪表进近实战指引',
+    scope: 'professional',
+    dept: '飞行运行',
+    cat: '航线技术',
+    time: '20分钟',
+    reads: '4,980',
+    desc: '低能见度二类进近(CAT II)、下击暴流风切变告警应对响应与高原单发飘降程序。',
+    badges: [{ text: '进阶技术', type: 'featured' }],
+    content: `【第一部分：风切变告警(Windshear Ahead)】
+起飞或进近听到“WINDSHEAR”语音警告，毫不迟疑执行逃逸机动：油门推至最大起飞推力(TOGA)，维持最大仰角。
+
+【第二部分：高高原机场单发失效飘降】
+高原机场地形险峻，预先调定飘降航路航向，遵照逃逸航线爬升至安全越障高度后再行备降决断。`
+  },
+  {
+    id: 'p8',
+    title: '客舱机上医疗急救实务与AED自动除颤仪操作SOP',
+    scope: 'professional',
+    dept: '客舱乘务',
+    cat: '医疗急救',
+    time: '18分钟',
+    reads: '7,150',
+    desc: '心脏骤停黄金4分钟心肺复苏按压节拍、AED电极片贴放要领、机上应急药箱调用与空中医疗协助。',
+    badges: [{ text: '客舱必修', type: 'hot' }],
+    content: `【第一章：高质量心肺复苏(CPR)实施要领】
+成人胸外按压深度 5-6 cm，按压频率 100-120 次/分钟；人工呼吸吹气比 30:2；每 2 分钟轮换一次施救人员避免疲劳。
+
+【第二章：AED 自动体外除颤仪使用】
+开启 AED 电源后撕开电极片包装，右片贴于右上胸锁骨下方，左片贴于左乳头外侧下方肋骨；分析心律及除颤放电时全员离开患者！`
   }
 ]
 
 const LEADERBOARD_USERS = [
-  { rank: 1, name: '陈思远', dept: '乘务一队', avatar: '陈', points: 12480, streak: 45, change: 0 },
-  { rank: 2, name: '林晓薇', dept: '乘务二队', avatar: '林', points: 11320, streak: 38, change: 1 },
-  { rank: 3, name: '王浩然', dept: '地勤部门', avatar: '王', points: 10950, streak: 30, change: -1 },
-  { rank: 4, name: '张雨桐', dept: '乘务一队', avatar: '张', points: 9840, streak: 27, change: 2 },
-  { rank: 5, name: '李明杰', dept: '安全地服', avatar: '李', points: 9210, streak: 22, change: -1 },
-  { rank: 6, name: '你 (我)', dept: '新入职学员', avatar: '你', points: 8760, streak: 18, change: 3, isMe: true },
+  { rank: 1, name: '陈思远', dept: '客舱服务部', avatar: '陈', points: 12480, streak: 45, change: 0 },
+  { rank: 2, name: '林晓薇', dept: '地面服务部', avatar: '林', points: 11320, streak: 38, change: 1 },
+  { rank: 3, name: '王浩然', dept: '飞行运行部', avatar: '王', points: 10950, streak: 30, change: -1 },
+  { rank: 4, name: '张雨桐', dept: '机务维修部', avatar: '张', points: 9840, streak: 27, change: 2 },
+  { rank: 5, name: '李明杰', dept: '航空安全部', avatar: '李', points: 9210, streak: 22, change: -1 },
+  { rank: 6, name: '你 (我)', dept: '客舱服务部', avatar: '你', points: 8760, streak: 18, change: 3, isMe: true },
   { rank: 7, name: '赵诗涵', dept: '乘务二队', avatar: '赵', points: 8340, streak: 14, change: -2 },
 ]
 
@@ -579,134 +768,226 @@ export default function App() {
     )
   }
 
-  // ── Page 4: 航空知识库 (EXACT REPLICA OF SCREENSHOT 3) ─────────────────────
+  // ── Page 4: 航空知识库 (双层架构：通用知识库 + 专业知识库) ─────────────────
   function KnowledgePage() {
-    const [selectedCat, setSelectedCat] = useState('全部')
+    const [scopeTab, setScopeTab] = useState<'general' | 'professional'>('general')
+    const [selectedFilter, setSelectedFilter] = useState('全部')
     const [searchQ, setSearchQ] = useState('')
 
-    const CATS = ['全部', '规章制度', '安全法规', '乘务知识', '服务技能', '航空知识', '安全培训']
+    const GENERAL_CATS = ['全部', '企业文化', '安全法规', '通用规范', '安全防护', '品牌制度', '综合素养']
+    const PROF_DEPTS = ['全部专业', '客舱乘务', '飞行运行', '地面服务', '机务维修', '空防安保', '货运物流']
 
-    const filteredDocs = KNOWLEDGE_DOCS.filter(d => {
-      if (selectedCat !== '全部' && d.cat !== selectedCat) return false
-      if (searchQ.trim() && !d.title.includes(searchQ) && !d.cat.includes(searchQ)) return false
+    const handleSwitchScope = (scope: 'general' | 'professional') => {
+      setScopeTab(scope)
+      setSelectedFilter(scope === 'general' ? '全部' : '全部专业')
+    }
+
+    const generalDocs = KNOWLEDGE_DOCS.filter(d => d.scope === 'general')
+    const profDocs = KNOWLEDGE_DOCS.filter(d => d.scope === 'professional')
+
+    const filteredDocs = (scopeTab === 'general' ? generalDocs : profDocs).filter(d => {
+      if (scopeTab === 'general') {
+        if (selectedFilter !== '全部' && d.cat !== selectedFilter) return false
+      } else {
+        if (selectedFilter !== '全部专业' && d.dept !== selectedFilter) return false
+      }
+      if (searchQ.trim()) {
+        const q = searchQ.toLowerCase()
+        const matchTitle = d.title.toLowerCase().includes(q)
+        const matchCat = d.cat.toLowerCase().includes(q)
+        const matchDesc = d.desc.toLowerCase().includes(q)
+        const matchDept = (d.dept || '').toLowerCase().includes(q)
+        if (!matchTitle && !matchCat && !matchDesc && !matchDept) return false
+      }
       return true
     })
+
+    const heroDoc = scopeTab === 'general'
+      ? generalDocs.find(d => d.id === 'g1') || generalDocs[0]
+      : profDocs.find(d => d.id === 'p1') || profDocs[0]
 
     return (
       <div className="p-8 space-y-6 max-w-6xl mx-auto">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-[#0B192C]">航空知识库</h1>
-            <p className="text-xs text-slate-500 mt-0.5">深圳航空官方规章与专业知识文章</p>
+            <p className="text-xs text-slate-500 mt-0.5">深圳航空全员通用标准与业务专业规章数字化资产库</p>
           </div>
-          <span className="text-xs font-medium px-3 py-1 rounded-full bg-[#FEF9EE] text-[#B45309] border border-[#FDE68A]">
-            官方规章已收录 48 篇
+          <span className="text-xs font-medium px-3.5 py-1.5 rounded-full bg-[#FEF9EE] text-[#B45309] border border-[#FDE68A]">
+            受控规章已收录 {KNOWLEDGE_DOCS.length} 篇 · 全员实时在线更新
           </span>
+        </div>
+
+        {/* Top Segmented Dual-Library Switcher */}
+        <div className="flex bg-slate-100 p-1 rounded-2xl gap-1.5 w-fit border border-slate-200">
+          <button
+            onClick={() => handleSwitchScope('general')}
+            className={`flex items-center gap-2.5 px-6 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              scopeTab === 'general'
+                ? 'bg-[#E60026] text-white shadow-sm'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
+            }`}
+          >
+            <span>📘 通用知识库</span>
+            <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
+              scopeTab === 'general' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-600'
+            }`}>
+              全员必修 · {generalDocs.length} 篇
+            </span>
+          </button>
+
+          <button
+            onClick={() => handleSwitchScope('professional')}
+            className={`flex items-center gap-2.5 px-6 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              scopeTab === 'professional'
+                ? 'bg-[#E60026] text-white shadow-sm'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
+            }`}
+          >
+            <span>📙 专业知识库</span>
+            <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
+              scopeTab === 'professional' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-600'
+            }`}>
+              分业务岗位 · {profDocs.length} 篇
+            </span>
+          </button>
         </div>
 
         {/* Search Bar */}
         <div className="relative">
-          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-500">🔍</span>
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-500 text-sm">🔍</span>
           <input
-            className="w-full pl-10 pr-4 py-3 bg-white border border-[#EEF0F4] rounded-xl text-xs text-slate-800 placeholder-slate-400 outline-none focus:border-[#E60026] transition-colors shadow-2xs"
-            placeholder="搜索规章、服务规范、知识文章..."
+            className="w-full pl-11 pr-4 py-3 bg-white border border-[#EEF0F4] rounded-xl text-xs text-slate-800 placeholder-slate-400 outline-none focus:border-[#E60026] transition-colors shadow-2xs"
+            placeholder={scopeTab === 'general' ? '搜索通用规章、企业文化、全员安全红线、行为规范...' : '搜索专业SOP、飞行技术、客舱服务、机务维修、空防安保规程...'}
             value={searchQ}
             onChange={e => setSearchQ(e.target.value)}
           />
         </div>
 
-        {/* Category Filter Pills */}
+        {/* Category / Department Filter Pills */}
         <div className="flex items-center gap-2 flex-wrap">
-          {CATS.map(cat => (
+          {(scopeTab === 'general' ? GENERAL_CATS : PROF_DEPTS).map(item => (
             <button
-              key={cat}
-              onClick={() => setSelectedCat(cat)}
+              key={item}
+              onClick={() => setSelectedFilter(item)}
               className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
-                selectedCat === cat
+                selectedFilter === item
                   ? 'bg-[#E60026] text-white font-bold shadow-xs'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
-              {cat}
+              {item}
             </button>
           ))}
         </div>
 
-        {/* Hero Featured Article Banner */}
-        <div 
-          onClick={() => setSelectedDoc(KNOWLEDGE_DOCS[0])}
-          className="relative rounded-2xl bg-[#0D1B2A] text-white p-7 overflow-hidden shadow-md cursor-pointer hover:opacity-95 transition-opacity"
-        >
-          <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-2xl">
-            <img
-              src="https://images.unsplash.com/photo-1506015391300-4802dc74de2e?auto=format&fit=crop&w=1200&q=80"
-              alt="Airplane wing in clouds"
-              className="w-full h-full object-cover opacity-25 mix-blend-luminosity"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#0D1B2A] via-[#0D1B2A]/80 to-[#0D1B2A]/70" />
-          </div>
+        {/* Dynamic Pinned Hero Article Banner */}
+        {heroDoc && (
+          <div 
+            onClick={() => setSelectedDoc(heroDoc)}
+            className="relative rounded-2xl bg-[#0D1B2A] text-white p-7 overflow-hidden shadow-md cursor-pointer hover:opacity-95 transition-opacity"
+          >
+            <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-2xl">
+              <img
+                src={scopeTab === 'general' 
+                  ? "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=1200&q=80"
+                  : "https://images.unsplash.com/photo-1506015391300-4802dc74de2e?auto=format&fit=crop&w=1200&q=80"
+                }
+                alt="Aircraft"
+                className="w-full h-full object-cover opacity-20 mix-blend-luminosity"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#0D1B2A] via-[#0D1B2A]/80 to-[#0D1B2A]/70" />
+            </div>
 
-          <div className="relative z-10 space-y-2 max-w-2xl">
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500 text-slate-950">
-              官方文件 2024 最新版
-            </span>
-            <h2 className="text-lg font-bold text-white mt-1">
-              《深圳航空乘务员服务操作手册》全文 · 2024年修订版
-            </h2>
-            <p className="text-xs text-slate-300 leading-relaxed">
-              包含 12 大服务章节，覆盖仪容仪表、餐食服务、应急处置等全部操作规范，新入职员工必读。
-            </p>
-            <div className="flex items-center gap-4 text-xs text-slate-400 pt-2">
-              <span>⏱ 45分钟</span>
-              <span>👁 18,240 阅读</span>
-              <button className="px-3.5 py-1.5 bg-[#E60026] hover:bg-[#CC0022] text-white text-xs font-bold rounded-lg transition-colors cursor-pointer">
-                立即阅读
-              </button>
+            <div className="relative z-10 space-y-2 max-w-2xl">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500 text-slate-950">
+                  {scopeTab === 'general' ? '全员通识 · 官方文件 2026' : `${heroDoc.dept} · 核心操作手册`}
+                </span>
+                <span className="text-[10px] text-slate-300">置顶推荐</span>
+              </div>
+
+              <h2 className="text-lg font-bold text-white mt-1">
+                {heroDoc.title}
+              </h2>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                {heroDoc.desc}
+              </p>
+              <div className="flex items-center gap-4 text-xs text-slate-400 pt-2">
+                <span>⏱ {heroDoc.time}</span>
+                <span>👁 {heroDoc.reads} 阅读</span>
+                <button className="px-3.5 py-1.5 bg-[#E60026] hover:bg-[#CC0022] text-white text-xs font-bold rounded-lg transition-colors cursor-pointer">
+                  立即阅读
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Document Cards Grid (2 Columns) */}
-        <div className="grid grid-cols-2 gap-4">
-          {filteredDocs.map(doc => (
-            <div
-              key={doc.id}
-              onClick={() => setSelectedDoc(doc)}
-              className="bg-white border border-[#EEF0F4] rounded-2xl p-5 hover:border-[#E60026] hover:shadow-xs transition-all cursor-pointer flex flex-col justify-between group"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-50 text-[#E60026]">
-                    {doc.cat}
-                  </span>
-                  <div className="flex items-center gap-1">
-                    {doc.badges.map((b, idx) => (
-                      <span
-                        key={idx}
-                        className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
-                          b.type === 'required' ? 'bg-rose-100 text-[#E60026]' :
-                          b.type === 'hot' ? 'bg-amber-100 text-amber-700' :
-                          b.type === 'featured' ? 'bg-blue-100 text-blue-700' :
-                          'bg-slate-100 text-slate-600'
-                        }`}
-                      >
-                        {{ ...b }.text}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
+            <span>当前展示：{filteredDocs.length} 篇规章手册</span>
+            <span className="text-slate-400">点击卡片可调阅受控全文</span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            {filteredDocs.map(doc => (
+              <div
+                key={doc.id}
+                onClick={() => setSelectedDoc(doc)}
+                className="bg-white border border-[#EEF0F4] rounded-2xl p-5 hover:border-[#E60026] hover:shadow-xs transition-all cursor-pointer flex flex-col justify-between group"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-1.5">
+                      {doc.scope === 'professional' && doc.dept && (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#0B192C] text-white">
+                          {doc.dept}
+                        </span>
+                      )}
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-50 text-[#E60026]">
+                        {doc.cat}
                       </span>
-                    ))}
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                      {doc.badges.map((b, idx) => (
+                        <span
+                          key={idx}
+                          className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
+                            b.type === 'required' ? 'bg-rose-100 text-[#E60026]' :
+                            b.type === 'hot' ? 'bg-amber-100 text-amber-700' :
+                            b.type === 'featured' ? 'bg-blue-100 text-blue-700' :
+                            'bg-slate-100 text-slate-600'
+                          }`}
+                        >
+                          {{ ...b }.text}
+                        </span>
+                      ))}
+                    </div>
                   </div>
+
+                  <h3 className="font-bold text-xs text-[#0B192C] group-hover:text-[#E60026] transition-colors leading-snug">
+                    {doc.title}
+                  </h3>
+                  <p className="text-[11px] text-slate-500 mt-1.5 line-clamp-2 leading-relaxed">
+                    {doc.desc}
+                  </p>
                 </div>
 
-                <h3 className="font-bold text-xs text-[#0B192C] group-hover:text-[#E60026] transition-colors leading-snug">
-                  {doc.title}
-                </h3>
+                <div className="flex items-center justify-between text-[11px] text-slate-400 pt-3 border-t border-slate-100 mt-3">
+                  <div className="flex items-center gap-3">
+                    <span>⏱ {doc.time}</span>
+                    <span>👁 {doc.reads}</span>
+                  </div>
+                  <span className="text-[#E60026] group-hover:translate-x-0.5 transition-transform font-bold text-[10px]">
+                    查阅规程 ➔
+                  </span>
+                </div>
               </div>
-
-              <div className="flex items-center justify-between text-[11px] text-slate-400 pt-3 border-t border-slate-100 mt-3">
-                <span>⏱ {doc.time}</span>
-                <span>👁 {doc.reads}</span>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     )
@@ -1144,31 +1425,51 @@ export default function App() {
 
       {/* Document Reader Modal */}
       {selectedDoc && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-50 text-[#E60026]">{selectedDoc.cat}</span>
-                <h3 className="font-bold text-base text-[#0B192C] mt-1">{selectedDoc.title}</h3>
+            <div className="flex items-start justify-between pb-3 border-b border-slate-100">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 text-[10px] text-slate-400 font-medium">
+                  <span>知识库</span>
+                  <span>/</span>
+                  <span className="text-[#E60026] font-bold">
+                    {selectedDoc.scope === 'general' ? '通用知识库' : `专业知识库 · ${selectedDoc.dept}`}
+                  </span>
+                  <span>/</span>
+                  <span className="text-slate-600">{selectedDoc.cat}</span>
+                </div>
+                <h3 className="font-bold text-base text-[#0B192C]">{selectedDoc.title}</h3>
               </div>
-              <button onClick={() => setSelectedDoc(null)} className="text-slate-400 hover:text-slate-600 cursor-pointer">✕</button>
+              <button onClick={() => setSelectedDoc(null)} className="text-slate-400 hover:text-slate-600 cursor-pointer text-lg">✕</button>
             </div>
 
-            <div className="max-h-72 overflow-y-auto p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs leading-relaxed text-slate-800 space-y-2 whitespace-pre-line">
+            <div className="max-h-72 overflow-y-auto p-4 bg-slate-50/80 rounded-xl border border-slate-200 text-xs leading-relaxed text-slate-800 space-y-2 whitespace-pre-line font-mono">
               {selectedDoc.content}
             </div>
 
             <div className="flex items-center justify-between pt-2 text-xs text-slate-400">
-              <span>阅读学时: {selectedDoc.time} · 受控版本: 2024-V3</span>
-              <button
-                onClick={() => {
-                  alert(`《${selectedDoc.title}》离线 PDF 已保存至本地！`)
-                  setSelectedDoc(null)
-                }}
-                className="px-4 py-2 bg-[#E60026] hover:bg-[#CC0022] text-white text-xs font-bold rounded-lg cursor-pointer"
-              >
-                下载离线受控版
-              </button>
+              <span>阅读学时: {selectedDoc.time} · 官方受控规程</span>
+              <div className="flex items-center gap-2.5">
+                <button
+                  onClick={() => {
+                    alert(`《${selectedDoc.title}》已成功缓存下载为离线受控 PDF 格式！`)
+                  }}
+                  className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg cursor-pointer transition-colors"
+                >
+                  下载受控 PDF
+                </button>
+                <button
+                  onClick={() => {
+                    setPoints(p => p + 20)
+                    confetti({ particleCount: 65, spread: 55, origin: { y: 0.6 } })
+                    alert(`完成《${selectedDoc.title}》阅读学习！\n已记录学时并奖励 +20 里程积分！`)
+                    setSelectedDoc(null)
+                  }}
+                  className="px-4 py-1.5 bg-[#E60026] hover:bg-[#CC0022] text-white text-xs font-bold rounded-lg cursor-pointer transition-colors shadow-xs"
+                >
+                  完成学习 (+20积分)
+                </button>
+              </div>
             </div>
           </div>
         </div>
