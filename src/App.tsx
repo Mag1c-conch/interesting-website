@@ -3,178 +3,178 @@ import confetti from 'canvas-confetti'
 
 type Page = 'home' | 'points' | 'ai' | 'vr' | 'knowledge' | 'leaderboard'
 
-const NAV_ITEMS: { id: Page; label: string; icon: string }[] = [
-  { id: 'home', label: '主页', icon: '⊞' },
-  { id: 'points', label: '积分激励', icon: '◆' },
-  { id: 'ai', label: 'AI 助手', icon: '✦' },
-  { id: 'vr', label: 'VR 学习', icon: '◉' },
-  { id: 'knowledge', label: '知识库', icon: '≡' },
-  { id: 'leaderboard', label: '排行榜', icon: '▲' },
+const NAV_ITEMS: { id: Page; label: string; iconType: 'home' | 'points' | 'ai' | 'vr' | 'knowledge' | 'leaderboard' }[] = [
+  { id: 'home', label: '学习主页', iconType: 'home' },
+  { id: 'points', label: '积分激励', iconType: 'points' },
+  { id: 'ai', label: 'AI 飞行助手', iconType: 'ai' },
+  { id: 'vr', label: 'VR 模拟训练', iconType: 'vr' },
+  { id: 'knowledge', label: '航空知识库', iconType: 'knowledge' },
+  { id: 'leaderboard', label: '学员排行榜', iconType: 'leaderboard' },
 ]
 
-interface Course {
-  id: number
+// ── Shared Data ─────────────────────────────────────────────────────────────
+
+interface CourseItem {
+  id: string
   title: string
-  category: string
-  progress: number
-  total: number
-  done: number
-  color: string
+  desc: string
+  tags: { text: string; color: 'red' | 'dark' | 'orange' }[]
+  duration: string
+  users: string
+  pts: string
   img: string
-  description?: string
 }
 
-const COURSES: Course[] = [
-  { id: 1, title: '机器学习基础与神经网络', category: '人工智能', progress: 72, total: 24, done: 17, color: '#6D4AFF', img: 'photo-1677442135703-1787eea5ce01', description: '深入理解梯度下降、反向传播与深度网络架构原理。' },
-  { id: 2, title: '民航机载仪表与自动飞行系统', category: '航空工程', progress: 38, total: 18, done: 7, color: '#A78BFA', img: 'photo-1540959733332-eab4deabeeaf', description: '全动模拟机驾驶舱核心总线、姿态指引与航道截获SOP。' },
-  { id: 3, title: 'Web3 与区块链底层架构', category: '前沿技术', progress: 55, total: 20, done: 11, color: '#7C3AED', img: 'photo-1639762681057-408e52192e55', description: '去中心化网络共识机制与智能合约安全性验证。' },
+const COURSES: CourseItem[] = [
+  {
+    id: 'c1',
+    title: '客舱紧急撤离演练',
+    desc: '模拟紧急情况下乘客疏散全流程，提升实战应对能力',
+    tags: [{ text: '必修', color: 'red' }, { text: '安全培训', color: 'dark' }],
+    duration: '45分钟',
+    users: '1,840 人',
+    pts: '+150 积分',
+    img: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=700&q=80'
+  },
+  {
+    id: 'c2',
+    title: '飞行机舱巡视服务',
+    desc: '模拟客机飞行中常规巡视、饮食服务规范流程',
+    tags: [{ text: '必修', color: 'red' }, { text: '乘务服务', color: 'dark' }],
+    duration: '30分钟',
+    users: '2,210 人',
+    pts: '+120 积分',
+    img: 'https://images.unsplash.com/photo-1506015391300-4802dc74de2e?auto=format&fit=crop&w=700&q=80'
+  },
+  {
+    id: 'c3',
+    title: '特殊旅客服务处理',
+    desc: '演练老幼病残旅客及特殊状况的专业应对方案',
+    tags: [{ text: '进阶', color: 'orange' }, { text: '服务培训', color: 'dark' }],
+    duration: '35分钟',
+    users: '1,320 人',
+    pts: '+130 积分',
+    img: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=700&q=80'
+  },
+  {
+    id: 'c4',
+    title: '深圳宝安机场导航',
+    desc: '虚拟还原深圳宝安国际机场，熟悉航站环境与设施',
+    tags: [{ text: '入门', color: 'red' }, { text: '机场航站', color: 'dark' }],
+    duration: '25分钟',
+    users: '3,050 人',
+    pts: '+100 积分',
+    img: 'https://images.unsplash.com/photo-1520437358207-323b43b50729?auto=format&fit=crop&w=700&q=80'
+  }
 ]
 
-const BADGES = [
-  { name: '七日连续', icon: '🔥', desc: '连续学习7天', earned: true },
-  { name: '速度之星', icon: '⚡', desc: '单日完成5节课', earned: true },
-  { name: '知识猎手', icon: '🎯', desc: '通过10次测验', earned: true },
-  { name: '深渊潜者', icon: '🌊', desc: '完成高级实操科目', earned: false },
-  { name: '领袖先锋', icon: '👑', desc: '登上排行榜前3名', earned: false },
-  { name: '全能学者', icon: '🏛️', desc: '涉猎6个不同专业领域', earned: false },
-]
-
-const LEADERBOARD_INITIAL = [
-  { rank: 1, name: '陈思远', avatar: 'CS', points: 12480, streak: 45, badge: '🏆', change: 0, likes: 89 },
-  { rank: 2, name: '林晓薇', avatar: 'LX', points: 11320, streak: 38, badge: '🥈', change: 1, likes: 67 },
-  { rank: 3, name: '王浩然', avatar: 'WH', points: 10950, streak: 30, badge: '🥉', change: -1, likes: 52 },
-  { rank: 4, name: '张雨桐', avatar: 'ZY', points: 9840, streak: 27, badge: '', change: 2, likes: 41 },
-  { rank: 5, name: '李明杰', avatar: 'LM', points: 9210, streak: 22, badge: '', change: -1, likes: 35 },
-  { rank: 6, name: '张晓航 (你)', avatar: 'ZH', points: 8760, streak: 18, badge: '', change: 3, isMe: true, likes: 124 },
-  { rank: 7, name: '赵诗涵', avatar: 'ZS', points: 8340, streak: 14, badge: '', change: -2, likes: 28 },
-  { rank: 8, name: '刘子轩', avatar: 'LZ', points: 7980, streak: 11, badge: '', change: 0, likes: 19 },
-]
-
-interface KnowledgeArticle {
+interface KnowledgeDoc {
   id: string
   title: string
   cat: string
-  reads: number
   time: string
-  tag: string
-  desc: string
+  reads: string
+  badges: { text: string; type: 'official' | 'required' | 'hot' | 'featured' }[]
   content: string
 }
 
-const KNOWLEDGE_TOPICS: KnowledgeArticle[] = [
-  { id: 'k1', title: '神经网络架构设计与反向传播算法', cat: '人工智能', reads: 3420, time: '8 分钟', tag: '热门', desc: '详解梯度下降、张量运算与多层感知机的权重更新机制。', content: '第一章：前向传播与损失函数定义\n在深度学习中，前向传播计算输入样本经过各层权重变换后的预测输出值...\n第二章：链式法则求导\n通过微积分链式法则逐层反向传递误差梯度，完成参数迭代。' },
-  { id: 'k2', title: '民航飞行机组快速参考手册 (QRH)', cat: '飞行规章', reads: 2890, time: '12 分钟', tag: '精选', desc: '非正常与突发紧急特情记忆项目处置动作流程。', content: '第一节：记忆项目 (Memory Items)\n1. 驾驶舱快速释压：戴好机组氧气面罩，接通100%模式。\n2. 发动机火警：确认故障发动机推力杆收回慢车并提拉灭火手柄。' },
-  { id: 'k3', title: 'Transformer 模型与注意力机制解析', cat: '深度学习', reads: 5640, time: '15 分钟', tag: '热门', desc: '自注意力机制(Self-Attention)数学原理及大模型应用。', content: '注意力权重计算公式：Attention(Q, K, V) = softmax(QK^T / sqrt(d_k))V...\n多头注意力机制有效提升了模型在不同子空间表征语义的能力。' },
-  { id: 'k4', title: '去中心化自治组织（DAO）治理机制', cat: 'Web3', reads: 1870, time: '6 分钟', tag: '新增', desc: '智能合约投票治理与资产管理体系分析。', content: 'DAO通过链上代币持有量实现治理权重的量化，智能合约保障决议自动执行。' },
-  { id: 'k5', title: '强化学习与自主决策控制', cat: '人工智能', reads: 2990, time: '10 分钟', tag: '', desc: '马尔可夫决策过程(MDP)及Q-learning算法实战。', content: 'Agent在与外部环境交互中通过探索与利用平衡，最大化长期累积奖励回报。' },
-  { id: 'k6', title: '高高原机场起降程序与风切变规避', cat: '飞行规章', reads: 4110, time: '18 分钟', tag: '精选', desc: '复杂地形盲降进近最低气象标准与复飞决断。', content: '标高2438米以上高高原机场空气密度稀薄，真速大幅高于表速，机组必须严格执行复飞决策程序。' },
+const KNOWLEDGE_DOCS: KnowledgeDoc[] = [
+  {
+    id: 'd1',
+    title: '深圳航空服务标准手册 (2024版)',
+    cat: '规章制度',
+    time: '15分钟',
+    reads: '4,320',
+    badges: [{ text: '官方', type: 'official' }, { text: '必读', type: 'required' }],
+    content: '第一章：乘务员仪容仪表与站姿仪态规范\n1.1 妆容要求遵循深航职业形象指引，发网整洁无杂发...\n1.2 登机迎客鞠躬礼仪与问候手势标准...\n第二章：机上餐饮服务动线与防烫伤规范\n2.1 热饮分发温度控制与递送原则...'
+  },
+  {
+    id: 'd2',
+    title: '民用航空安全法规要点精解',
+    cat: '安全法规',
+    time: '20分钟',
+    reads: '3,180',
+    badges: [{ text: '官方', type: 'official' }, { text: '热门', type: 'hot' }],
+    content: '第一部分：中国民用航空局 CCAR-121 部法规精髓\n针对空勤人员执勤时间限制、机上安保违规行为处置法则...\n第二部分：非法干扰行为处置 SOP\n机组协同配合流程与客舱安全员处突联动机制。'
+  },
+  {
+    id: 'd3',
+    title: '客舱空气质量与健康管理指南',
+    cat: '乘务知识',
+    time: '8分钟',
+    reads: '2,040',
+    badges: [],
+    content: '高空巡航环境座舱增压气压相当于海拔 1800-2400 米高度，湿度通常低于 15%。机组应指导旅客适当饮水，并监控空调环控系统分配情况。'
+  },
+  {
+    id: 'd4',
+    title: '跨文化服务礼仪：国际航线乘客沟通',
+    cat: '服务技能',
+    time: '12分钟',
+    reads: '2,870',
+    badges: [{ text: '精选', type: 'featured' }],
+    content: '国际及地区航线中，涉及宗教饮食禁忌、文化手势差异及外语专业服务用语。乘务人员应保持微笑、倾听并准确提供定制化协助。'
+  },
+  {
+    id: 'd5',
+    title: '航空气象基础：乘务员须知',
+    cat: '航空知识',
+    time: '10分钟',
+    reads: '1,960',
+    badges: [],
+    content: '对流层颠簸与晴空颠簸 (CAT) 的特征分析。听到机长发出“机组请立即就座系好安全带”指令后，乘务员应就近锁定餐车并立刻在最近空座就座。'
+  },
+  {
+    id: 'd6',
+    title: '机上医疗急救流程与操作规范',
+    cat: '安全培训',
+    time: '18分钟',
+    reads: '5,610',
+    badges: [{ text: '官方', type: 'official' }, { text: '热门', type: 'hot' }],
+    content: '心脏骤停急救全流程：AED 除颤仪定位与电极片黏贴要领；成人与儿童心肺复苏 (CPR) 按压频率与人工呼吸比例 (30:2)；机上急救药箱开启授权。'
+  }
 ]
 
-interface VRScenarioItem {
-  id: string
-  title: string
-  desc: string
-  cat: string
-  difficulty: '入门' | '中级' | '高级'
-  duration: string
-  users: number
-  img: string
-  hudData: { alt: string; speed: string; heading: string; throttle: string }
-}
-
-const VR_COURSES: VRScenarioItem[] = [
-  { id: 'vr-1', title: '航前准备与全动座舱盲操', desc: '1:1座舱全景盲操，演练顶板全电门检查单复核', cat: '标准程序', difficulty: '入门', duration: '25分钟', users: 2340, img: 'photo-1540959733332-eab4deabeeaf', hudData: { alt: '0 FT', speed: '0 KT', heading: '180°', throttle: 'IDLE' } },
-  { id: 'vr-2', title: '极限侧风起飞与抬轮决断', desc: '在25节强侧风下演练副翼与方向舵协同滑跑修正', cat: '操纵技能', difficulty: '中级', duration: '35分钟', users: 1820, img: 'photo-1559757148-5c350d0d3c56', hudData: { alt: '120 FT', speed: '154 KT', heading: '090°', throttle: '98% N1' } },
-  { id: 'vr-3', title: 'CAT II 低能见度盲降着陆', desc: '大雾低视程进近，严谨执行DH决断高度目视确认', cat: '复杂气象', difficulty: '高级', duration: '40分钟', users: 3150, img: 'photo-1552832230-c0197dd311b5', hudData: { alt: '250 FT', speed: '138 KT', heading: '270°', throttle: 'AUTO' } },
-  { id: 'vr-4', title: '高空座舱快速释压与紧急下降', desc: '模拟巡航高度释压警报，全速下降至安全平飞层', cat: '应急特情', difficulty: '高级', duration: '50分钟', users: 980, img: 'photo-1628258334105-2a0b3d6efee1', hudData: { alt: '10,000 FT', speed: '290 KT', heading: '245°', throttle: 'SPEEDBRK' } },
+const LEADERBOARD_USERS = [
+  { rank: 1, name: '陈思远', dept: '乘务一队', avatar: '陈', points: 12480, streak: 45, change: 0 },
+  { rank: 2, name: '林晓薇', dept: '乘务二队', avatar: '林', points: 11320, streak: 38, change: 1 },
+  { rank: 3, name: '王浩然', dept: '地勤部门', avatar: '王', points: 10950, streak: 30, change: -1 },
+  { rank: 4, name: '张雨桐', dept: '乘务一队', avatar: '张', points: 9840, streak: 27, change: 2 },
+  { rank: 5, name: '李明杰', dept: '安全地服', avatar: '李', points: 9210, streak: 22, change: -1 },
+  { rank: 6, name: '你 (我)', dept: '新入职学员', avatar: '你', points: 8760, streak: 18, change: 3, isMe: true },
+  { rank: 7, name: '赵诗涵', dept: '乘务二队', avatar: '赵', points: 8340, streak: 14, change: -2 },
 ]
 
 type ChatMsg = { role: 'user' | 'ai'; text: string; time: string; refDoc?: string }
 
-const INITIAL_MSGS: ChatMsg[] = [
-  { role: 'ai', text: '你好！我是你的 AI 学习助手。我可以帮你解答课程疑问、制定学习计划、分析知识点，或者进行考试测验。今天想从哪里开始？', time: '刚刚' },
-]
-
-const AI_RESPONSES: Record<string, { text: string; ref?: string }> = {
-  default: {
-    text: '这是一个很好的问题！让我为你详细解析这个知识点。根据你当前的学习进度，建议你从基础概念入手，循序渐进地理解核心原理。你希望我用哪种方式来解释？',
-  },
-  机器学习: {
-    text: '机器学习的核心是让计算机从数据中自动学习规律。主要分为：\n\n1. **监督学习** — 有标签数据训练\n2. **无监督学习** — 发现数据内在结构\n3. **强化学习** — 通过奖励信号优化决策\n\n你目前在第17课，即将进入神经网络部分，需要我重点讲解反向传播算法吗？',
-    ref: '神经网络架构设计与反向传播算法'
-  },
-  计划: {
-    text: '根据你的学习数据，我为你制定了本周计划：\n\n• **周一/三/五** — 理论课程，每次45分钟\n• **周二/四** — VR模拟实操训练，每次30分钟\n• **周末** — 复习与小测验\n\n预计本周可获得 +480 积分，冲刺排行榜前5！'
-  },
-  检查单: {
-    text: '标准航前检查单关键记忆项目规范：\n1. 氧气面罩测试 (100% 正压送气并指示正常)\n2. 导航控制源与备用高度表场压校准 (QNH)\n3. 发电机电门及交联汇流条联锁确认\n4. 起飞襟翼设定与绿灯常亮。\n\n具体操作参数可查看受控手册《飞行机组快速参考手册 (QRH)》。',
-    ref: '民航飞行机组快速参考手册 (QRH)'
-  }
-}
-
-function getAIResponse(input: string): { text: string; ref?: string } {
-  if (input.includes('机器学习') || input.includes('神经网络')) return AI_RESPONSES['机器学习']
-  if (input.includes('计划') || input.includes('安排')) return AI_RESPONSES['计划']
-  if (input.includes('检查单') || input.includes('规程') || input.includes('手册')) return AI_RESPONSES['检查单']
-  return AI_RESPONSES['default']
-}
-
-function StepBar({ steps, current }: { steps: string[]; current: number }) {
-  return (
-    <div className="flex items-center gap-0 w-full">
-      {steps.map((s, i) => (
-        <div key={i} className="flex items-center flex-1 last:flex-none">
-          <div className="flex flex-col items-center gap-1">
-            <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
-              i < current ? 'bg-[#6D4AFF] text-white' :
-              i === current ? 'bg-[#6D4AFF] text-white ring-4 ring-[#F0EEFF]' :
-              'bg-[#F0EEFF] text-[#A78BFA]'
-            }`}>
-              {i < current ? '✓' : i + 1}
-            </div>
-            <span className="text-[10px] text-[#7B7A96] whitespace-nowrap">{s}</span>
-          </div>
-          {i < steps.length - 1 && (
-            <div className={`h-0.5 flex-1 mx-1 mb-3 transition-all duration-300 ${i < current ? 'bg-[#6D4AFF]' : 'bg-[#E8E6F5]'}`} />
-          )}
-        </div>
-      ))}
-    </div>
-  )
-}
-
-// ── Application Component ───────────────────────────────────────────────────
+// ── Main Shell ──────────────────────────────────────────────────────────────
 
 export default function App() {
-  const [page, setPage] = useState<Page>('home')
+  const [page, setPage] = useState<Page>('points')
   const [points, setPoints] = useState(8760)
   const [streakDays, setStreakDays] = useState(18)
   const [checkedInToday, setCheckedInToday] = useState(false)
 
   // Interactive Modals
-  const [activeCourse, setActiveCourse] = useState<Course | null>(null)
-  const [activeDoc, setActiveDoc] = useState<KnowledgeArticle | null>(null)
+  const [selectedCourse, setSelectedCourse] = useState<CourseItem | null>(null)
+  const [selectedDoc, setSelectedDoc] = useState<KnowledgeDoc | null>(null)
   const [isCheckinModalOpen, setIsCheckinModalOpen] = useState(false)
-  const [selectedVRScenario, setSelectedVRScenario] = useState<VRScenarioItem | null>(null)
   const [isVRRunning, setIsVRRunning] = useState(false)
 
-  // Quick Daily Tasks
-  const [tasks, setTasks] = useState([
-    { id: 1, task: '完成《反向传播算法与模型调试》课程', pts: 50, done: true },
-    { id: 2, task: '参与《航前检查单与仪表标定》小测验', pts: 80, done: false },
-    { id: 3, task: '在知识库查阅并收藏一篇专业手册', pts: 20, done: false },
+  // Daily Tasks
+  const [dailyTasks, setDailyTasks] = useState([
+    { id: 1, text: '完成一节《客舱紧急撤离演练》课程', pts: 50, done: true },
+    { id: 2, text: '通过《航空安全管理法规》章节测验', pts: 80, done: false },
+    { id: 3, text: '在航空知识库查阅并收藏 1 篇规章手册', pts: 20, done: false },
   ])
 
-  // Leaderboard data with likes
-  const [leaderboard, setLeaderboard] = useState(LEADERBOARD_INITIAL)
-
-  const handleToggleTask = (taskId: number) => {
-    setTasks(prev => prev.map(t => {
-      if (t.id === taskId) {
+  const handleToggleDailyTask = (id: number) => {
+    setDailyTasks(prev => prev.map(t => {
+      if (t.id === id) {
         const nextDone = !t.done
         if (nextDone) {
           setPoints(p => p + t.pts)
-          confetti({ particleCount: 60, spread: 60, origin: { y: 0.7 } })
+          confetti({ particleCount: 70, spread: 60, origin: { y: 0.65 } })
         } else {
           setPoints(p => p - t.pts)
         }
@@ -190,136 +190,120 @@ export default function App() {
     setStreakDays(d => d + 1)
     setPoints(p => p + 30)
     setIsCheckinModalOpen(true)
-    confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } })
+    confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } })
   }
 
-  const handleLikeUser = (rank: number) => {
-    setLeaderboard(prev => prev.map(u => {
-      if (u.rank === rank) {
-        return { ...u, likes: u.likes + 1 }
-      }
-      return u
-    }))
-  }
-
-  // ── Pages ─────────────────────────────────────────────────────────────────
-
+  // ── Page 1: 学习主页 ───────────────────────────────────────────────────────
   function HomePage() {
     return (
-      <div className="p-8 space-y-8 max-w-5xl mx-auto">
-        {/* Greeting & Checkin Header */}
-        <div className="flex items-start justify-between">
-          <div>
-            <p className="text-sm text-[#7B7A96] font-medium mb-1">早上好，张晓航 👋</p>
-            <h1 className="text-3xl font-extrabold text-[#1A1A2E] leading-tight">继续你的数字化实训旅程</h1>
-            <p className="text-[#7B7A96] text-xs mt-1">
-              今日目标：完成 2 节理论课 · 当前连续实训 <span className="text-[#6D4AFF] font-bold">{streakDays} 天</span>
-            </p>
-          </div>
-          <button
-            onClick={handleCheckIn}
-            className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all cursor-pointer ${
-              checkedInToday 
-                ? 'bg-[#E8E6F5] text-[#7B7A96] cursor-default' 
-                : 'bg-[#F0EEFF] hover:bg-[#E8E0FF] text-[#6D4AFF] hover:scale-105 shadow-sm'
-            }`}
-          >
-            <span className="text-lg">🔥</span>
-            <div className="text-left">
-              <p className="text-[10px] text-[#7B7A96] leading-none">{checkedInToday ? '今日已签到' : '点击签到 +30'}</p>
-              <p className="text-lg font-extrabold text-[#6D4AFF] leading-tight">{streakDays} 天</p>
-            </div>
-          </button>
-        </div>
-
-        {/* Stats row */}
-        <div className="grid grid-cols-4 gap-4">
-          {[
-            { label: '累计总积分', value: points.toLocaleString(), icon: '◆', color: '#6D4AFF', bg: '#F0EEFF' },
-            { label: '完成课程', value: '12', icon: '✓', color: '#059669', bg: '#ECFDF5' },
-            { label: '学习学时', value: '32.5h', icon: '◷', color: '#D97706', bg: '#FFFBEB' },
-            { label: '排行榜名次', value: '#6', icon: '▲', color: '#DC2626', bg: '#FEF2F2' },
-          ].map(s => (
-            <div key={s.label} className="bg-white border border-[#E8E6F5] rounded-xl p-4 shadow-2xs">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs text-[#7B7A96] font-medium">{s.label}</span>
-                <span style={{ color: s.color, background: s.bg }} className="w-7 h-7 rounded-lg flex items-center justify-center text-sm font-bold">{s.icon}</span>
-              </div>
-              <p className="text-2xl font-extrabold text-[#1A1A2E]">{s.value}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Weekly path */}
-        <div className="bg-white border border-[#E8E6F5] rounded-xl p-6 shadow-2xs">
-          <h2 className="text-xs font-bold text-[#7B7A96] uppercase tracking-wider mb-4">本周实训进阶路径</h2>
-          <StepBar steps={['基础理论', '驾驶舱程序', '实操演练', '特情决断', '考核结业']} current={2} />
-        </div>
-
-        {/* Current courses */}
+      <div className="p-8 space-y-7 max-w-6xl mx-auto">
         <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-[#1A1A2E]">推荐学习任务</h2>
-            <span className="text-xs text-[#7B7A96]">点击卡片可进入微课演练</span>
-          </div>
-          <div className="grid grid-cols-3 gap-4">
-            {COURSES.map(c => (
-              <div
-                key={c.id}
-                onClick={() => setActiveCourse(c)}
-                className="bg-white border border-[#E8E6F5] rounded-xl overflow-hidden hover:shadow-md hover:border-[#A78BFA] transition-all duration-200 cursor-pointer group"
-              >
-                <div className="h-28 overflow-hidden relative bg-[#1A1A2E]">
-                  <img
-                    src={`https://images.unsplash.com/${c.img}?w=400&h=200&fit=crop&auto=format`}
-                    alt={c.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-80"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <span className="absolute bottom-2 left-3 text-white text-[10px] font-semibold bg-black/40 px-2 py-0.5 rounded-full backdrop-blur-xs">
-                    {c.category}
-                  </span>
-                </div>
-                <div className="p-4">
-                  <h3 className="font-bold text-[#1A1A2E] text-sm mb-3 line-clamp-1 group-hover:text-[#6D4AFF] transition-colors">{c.title}</h3>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs text-[#7B7A96]">{c.done}/{c.total} 节</span>
-                    <span className="text-xs font-bold" style={{ color: c.color }}>{c.progress}%</span>
-                  </div>
-                  <div className="w-full h-1.5 bg-[#F0EEFF] rounded-full overflow-hidden">
-                    <div className="h-full rounded-full transition-all duration-500" style={{ width: `${c.progress}%`, background: c.color }} />
-                  </div>
-                </div>
+          <h1 className="text-2xl font-bold text-[#0B192C]">学习主页</h1>
+          <p className="text-xs text-slate-500 mt-0.5">深圳航空新入职员工综合实训计划与今日学习任务</p>
+        </div>
+
+        {/* Hero Card */}
+        <div className="relative rounded-2xl bg-[#0D1B2A] text-white p-7 overflow-hidden shadow-md">
+          <div className="absolute inset-0 bg-[radial-gradient(#1E3A8A_1px,transparent_1px)] [background-size:20px_20px] opacity-20 pointer-events-none" />
+          <div className="relative z-10 flex items-center justify-between">
+            <div className="space-y-2 max-w-xl">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#E60026] text-white">
+                  深圳航空 · 数字化培训
+                </span>
+                <span className="text-xs text-slate-300">入职第 18 天</span>
               </div>
-            ))}
+              <h2 className="text-2xl font-black text-white tracking-wide">
+                欢迎回来，李明杰！
+              </h2>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                今日建议优先完成【客舱紧急撤离演练】VR 实操课，已为您分配承德实训基地模拟客舱工位。
+              </p>
+              <div className="flex items-center gap-3 pt-2">
+                <button
+                  onClick={() => setPage('vr')}
+                  className="px-4 py-2 bg-[#E60026] hover:bg-[#CC0022] text-white text-xs font-bold rounded-lg transition-colors cursor-pointer"
+                >
+                  进入 VR 模拟训练
+                </button>
+                <button
+                  onClick={() => setPage('knowledge')}
+                  className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-lg transition-colors cursor-pointer"
+                >
+                  查阅服务标准手册
+                </button>
+              </div>
+            </div>
+
+            <div className="text-right shrink-0">
+              <p className="text-xs text-slate-400">当前里程积分</p>
+              <p className="text-4xl font-extrabold text-white font-mono mt-0.5">{points.toLocaleString()}</p>
+              <span className="inline-block mt-2 text-[10px] px-2.5 py-1 rounded bg-emerald-950/70 text-emerald-300 border border-emerald-500/40">
+                高级乘务员 · 冲刺乘务长
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Today tasks */}
-        <div className="bg-[#F8F7FF] border border-[#E8E6F5] rounded-xl p-6 shadow-2xs">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xs font-bold text-[#7B7A96] uppercase tracking-wider">今日任务（鼠标点击打钩完成）</h2>
-            <span className="text-xs text-[#6D4AFF] font-medium">可即时累加积分</span>
+        {/* 3 Stats Overview */}
+        <div className="grid grid-cols-3 gap-5">
+          <div 
+            onClick={handleCheckIn}
+            className="bg-white border border-[#EEF0F4] rounded-2xl p-5 shadow-xs flex items-start gap-4 cursor-pointer hover:border-[#E60026] transition-colors"
+          >
+            <div className="text-3xl">🔥</div>
+            <div>
+              <div className="text-2xl font-extrabold text-[#0B192C] font-mono">{streakDays}天</div>
+              <div className="text-xs text-slate-600 font-medium mt-0.5">连续学习</div>
+              <div className="text-[11px] text-[#E60026] mt-0.5">{checkedInToday ? '今日已签到' : '点击打卡 +30分'}</div>
+            </div>
           </div>
+
+          <div className="bg-white border border-[#EEF0F4] rounded-2xl p-5 shadow-xs flex items-start gap-4">
+            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-lg">✓</div>
+            <div>
+              <div className="text-2xl font-extrabold text-[#0B192C] font-mono">247个</div>
+              <div className="text-xs text-slate-600 font-medium mt-0.5">完成实操任务</div>
+              <div className="text-[11px] text-[#E60026] mt-0.5">本月 +38</div>
+            </div>
+          </div>
+
+          <div className="bg-white border border-[#EEF0F4] rounded-2xl p-5 shadow-xs flex items-start gap-4">
+            <div className="text-3xl">🎯</div>
+            <div>
+              <div className="text-2xl font-extrabold text-[#0B192C] font-mono">64次</div>
+              <div className="text-xs text-slate-600 font-medium mt-0.5">测验通过</div>
+              <div className="text-[11px] text-[#E60026] mt-0.5">正确率 87%</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Tasks Section */}
+        <div className="bg-white border border-[#EEF0F4] rounded-2xl p-6 shadow-xs space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <h2 className="text-sm font-bold text-[#0B192C]">今日实训任务（点击打钩完成）</h2>
+            <span className="text-xs text-slate-400">完成可自动累加里程积分</span>
+          </div>
+
           <div className="space-y-3">
-            {tasks.map(t => (
+            {dailyTasks.map(t => (
               <div
                 key={t.id}
-                onClick={() => handleToggleTask(t.id)}
-                className="flex items-center justify-between p-2 rounded-lg hover:bg-white/80 transition-colors cursor-pointer"
+                onClick={() => handleToggleDailyTask(t.id)}
+                className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer border border-transparent hover:border-slate-200"
               >
                 <div className="flex items-center gap-3">
-                  <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center text-xs transition-all ${
-                    t.done ? 'bg-[#6D4AFF] border-[#6D4AFF] text-white font-bold' : 'border-[#C4C0E8] bg-white'
+                  <div className={`w-5 h-5 rounded-md border flex items-center justify-center text-xs font-bold transition-colors ${
+                    t.done ? 'bg-[#E60026] border-[#E60026] text-white' : 'border-slate-300 bg-white'
                   }`}>
                     {t.done && '✓'}
                   </div>
-                  <span className={`text-sm font-medium ${t.done ? 'line-through text-[#A78BFA]' : 'text-[#1A1A2E]'}`}>
-                    {t.task}
+                  <span className={`text-xs font-medium ${t.done ? 'line-through text-slate-400' : 'text-slate-800'}`}>
+                    {{ ...t }.text}
                   </span>
                 </div>
-                <span className="text-xs font-bold text-[#6D4AFF] bg-[#F0EEFF] px-2.5 py-1 rounded-full">
-                  +{t.pts}
+                <span className="text-xs font-bold text-[#E60026] bg-rose-50 px-2.5 py-0.5 rounded-full">
+                  +{t.pts} 积分
                 </span>
               </div>
             ))}
@@ -329,117 +313,506 @@ export default function App() {
     )
   }
 
+  // ── Page 2: 积分激励 (EXACT REPLICA OF SCREENSHOT 1) ───────────────────────
   function PointsPage() {
     return (
-      <div className="p-8 space-y-8 max-w-5xl mx-auto">
+      <div className="p-8 space-y-6 max-w-6xl mx-auto">
         <div>
-          <h1 className="text-3xl font-extrabold text-[#1A1A2E]">积分与激励</h1>
-          <p className="text-[#7B7A96] text-xs mt-1">追踪你的成就与段位，解锁专属实训权益</p>
+          <h1 className="text-2xl font-bold text-[#0B192C]">积分激励</h1>
+          <p className="text-xs text-slate-500 mt-0.5">里程积分记录你的每一步成长，解锁航空职业荣誉</p>
         </div>
 
-        {/* Points hero */}
-        <div className="bg-gradient-to-br from-[#6D4AFF] to-[#7C3AED] rounded-2xl p-8 text-white relative overflow-hidden shadow-md">
-          <div className="absolute top-0 right-0 w-48 h-48 rounded-full bg-white/5 -translate-y-12 translate-x-12 pointer-events-none" />
-          <div className="absolute bottom-0 left-20 w-32 h-32 rounded-full bg-white/5 translate-y-8 pointer-events-none" />
-          <div className="relative flex items-end justify-between">
-            <div>
-              <p className="text-white/70 text-xs font-medium mb-1">当前可用积分</p>
-              <p className="text-5xl font-extrabold mb-2 font-mono">{points.toLocaleString()}</p>
-              <div className="flex items-center gap-2">
-                <span className="bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full backdrop-blur-xs">初级副驾驶 (白金学者)</span>
-                <span className="text-white/70 text-xs">距升级黄金段位还差 1,240 分</span>
+        {/* Dark Navy Hero Card with Airplane silhouette */}
+        <div className="relative rounded-2xl bg-[#0D1B2A] text-white p-7 overflow-hidden shadow-md">
+          <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-2xl">
+            <img
+              src="https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=1200&q=80"
+              alt="Airplane silhouette"
+              className="w-full h-full object-cover opacity-25 mix-blend-luminosity scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0D1B2A] via-[#0D1B2A]/70 to-[#0D1B2A]/90" />
+          </div>
+
+          <div className="relative z-10 flex items-start justify-between">
+            <div className="space-y-2">
+              <div className="text-xs text-slate-300 flex items-center gap-1.5 font-medium">
+                <span className="text-amber-400">✈</span>
+                <span>深圳航空 · 里程积分卡</span>
+              </div>
+
+              <div className="pt-1">
+                <span className="text-[10px] text-slate-400 block mb-1">当前等级</span>
+                <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-950/70 text-emerald-400 border border-emerald-500/40">
+                  高级乘务员
+                </span>
+              </div>
+
+              <div className="pt-2">
+                <div className="text-4xl font-extrabold font-mono tracking-tight">{points.toLocaleString()}</div>
+                <p className="text-[11px] text-slate-400 mt-1">
+                  距下一等级 <strong className="text-slate-200">乘务长</strong> 还差 240 分
+                </p>
               </div>
             </div>
+
             <div className="text-right">
-              <p className="text-white/70 text-xs mb-1">本周获得</p>
-              <p className="text-2xl font-bold font-mono">+480</p>
-              <p className="text-white/70 text-xs mt-1">↑ 较上周 +23%</p>
+              <p className="text-xs text-slate-400">本周获得</p>
+              <p className="text-2xl font-extrabold font-mono text-white mt-0.5">+480</p>
+              <p className="text-[11px] text-emerald-400 mt-1">↑ 较上周 +23%</p>
             </div>
           </div>
 
-          {/* Level bar */}
-          <div className="relative mt-6">
-            <div className="flex justify-between text-xs text-white/70 mb-1.5 font-mono">
-              <span>白金阶段 (8,000)</span>
-              <span>黄金大师 (10,000)</span>
+          {/* Red to Gold Segmented Progress Bar */}
+          <div className="relative mt-7 pt-2">
+            <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden flex">
+              <div className="w-[65%] h-full bg-[#E60026]" />
+              <div className="w-[18%] h-full bg-[#F59E0B]" />
             </div>
-            <div className="w-full h-2 bg-white/20 rounded-full overflow-hidden">
-              <div className="h-full bg-white rounded-full transition-all duration-700" style={{ width: `${Math.min(100, (points / 10000) * 100)}%` }} />
+            <div className="flex justify-between text-[10px] text-slate-400 mt-2 font-medium">
+              <span>高级乘务员 (5,000)</span>
+              <span>乘务长 (9,000)</span>
             </div>
           </div>
         </div>
 
-        {/* Quick stats */}
-        <div className="grid grid-cols-3 gap-4">
-          {[
-            { label: '连续实训天数', value: `${streakDays}天`, sub: '最高记录 32天', icon: '🔥' },
-            { label: '完成实操任务', value: '247', sub: '本月新增 38项', icon: '✓' },
-            { label: '理论测验通过', value: '64次', sub: '综合正确率 87%', icon: '🎯' },
-          ].map(s => (
-            <div key={s.label} className="bg-white border border-[#E8E6F5] rounded-xl p-5 shadow-2xs">
-              <div className="text-2xl mb-2">{s.icon}</div>
-              <p className="text-2xl font-extrabold text-[#1A1A2E]">{s.value}</p>
-              <p className="text-xs text-[#7B7A96] font-medium mt-0.5">{s.label}</p>
-              <p className="text-xs text-[#A78BFA] mt-1">{s.sub}</p>
+        {/* 3 Stats Overview Cards */}
+        <div className="grid grid-cols-3 gap-5">
+          <div className="bg-white border border-[#EEF0F4] rounded-2xl p-5 shadow-xs flex items-start gap-4">
+            <div className="text-3xl">🔥</div>
+            <div>
+              <div className="text-2xl font-extrabold text-[#0B192C] font-mono">{streakDays}天</div>
+              <div className="text-xs text-slate-600 font-medium mt-0.5">连续学习</div>
+              <div className="text-[11px] text-[#E60026] mt-0.5">最高记录 32天</div>
+            </div>
+          </div>
+
+          <div className="bg-white border border-[#EEF0F4] rounded-2xl p-5 shadow-xs flex items-start gap-4">
+            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-lg">✓</div>
+            <div>
+              <div className="text-2xl font-extrabold text-[#0B192C] font-mono">247个</div>
+              <div className="text-xs text-slate-600 font-medium mt-0.5">完成任务</div>
+              <div className="text-[11px] text-[#E60026] mt-0.5">本月 +38</div>
+            </div>
+          </div>
+
+          <div className="bg-white border border-[#EEF0F4] rounded-2xl p-5 shadow-xs flex items-start gap-4">
+            <div className="text-3xl">🎯</div>
+            <div>
+              <div className="text-2xl font-extrabold text-[#0B192C] font-mono">64次</div>
+              <div className="text-xs text-slate-600 font-medium mt-0.5">测验通过</div>
+              <div className="text-[11px] text-[#E60026] mt-0.5">正确率 87%</div>
+            </div>
+          </div>
+        </div>
+
+        {/* 荣誉徽章 */}
+        <div>
+          <h2 className="text-sm font-bold text-[#0B192C] mb-3">荣誉徽章</h2>
+          <div className="grid grid-cols-6 gap-3">
+            {[
+              { title: '安全先锋', desc: '通过首次安全测验', icon: '🛡️', earned: true },
+              { title: '准点达人', desc: '连续7天按时完课', icon: '⏱️', earned: true },
+              { title: '乘务之星', desc: '服务礼仪满分通过', icon: '⭐', earned: true },
+              { title: '模拟飞行家', desc: '完成3次VR实感', icon: '✈️', earned: false },
+              { title: '知识领航', desc: '阅读20篇知识文章', icon: '🧭', earned: false },
+              { title: '团队之翼', desc: '帮助3位同学答疑', icon: '🤝', earned: false },
+            ].map(b => (
+              <div
+                key={b.title}
+                onClick={() => alert(`【${b.title}】\n获得条件：${b.desc}\n状态：${b.earned ? '已获得' : '待解锁'}`)}
+                className={`bg-white border rounded-2xl p-4 flex flex-col items-center justify-between text-center transition-all cursor-pointer shadow-2xs ${
+                  b.earned ? 'border-[#EEF0F4] hover:border-[#E60026]' : 'border-[#EEF0F4] opacity-50'
+                }`}
+              >
+                <div className="text-3xl my-1">{b.icon}</div>
+                <div>
+                  <h3 className="text-xs font-bold text-[#0B192C]">{b.title}</h3>
+                  <p className="text-[10px] text-slate-400 mt-1 leading-tight">{b.desc}</p>
+                </div>
+                <span className={`text-[9px] mt-2 px-1.5 py-0.5 rounded font-medium ${
+                  b.earned ? 'bg-rose-50 text-[#E60026]' : 'bg-slate-100 text-slate-400'
+                }`}>
+                  {b.earned ? '已获得' : '待解锁'}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 积分获取途径 */}
+        <div className="bg-white border border-[#EEF0F4] rounded-2xl p-6 shadow-xs">
+          <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">积分获取途径</h2>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-slate-50/50">
+              <div className="flex items-center gap-2.5">
+                <span className="text-lg">📚</span>
+                <span className="text-xs font-medium text-slate-800">完成一节课程</span>
+              </div>
+              <span className="text-xs font-bold text-[#E60026]">+50</span>
+            </div>
+            <div className="flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-slate-50/50">
+              <div className="flex items-center gap-2.5">
+                <span className="text-lg">📝</span>
+                <span className="text-xs font-medium text-slate-800">通过章节测验</span>
+              </div>
+              <span className="text-xs font-bold text-[#E60026]">+80</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ── Page 3: VR 模拟训练 (EXACT REPLICA OF SCREENSHOT 2) ───────────────────
+  function VRPage() {
+    return (
+      <div className="p-8 space-y-6 max-w-6xl mx-auto">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-[#0B192C]">VR 模拟训练舱</h1>
+            <p className="text-xs text-slate-500 mt-0.5">沉浸式飞行模拟，提前感受真实客舱工作场景</p>
+          </div>
+          <span className="text-xs font-bold px-3 py-1.5 rounded-full border border-[#E60026] text-[#E60026] bg-rose-50/50">
+            ➔ 4 个训练模块可用
+          </span>
+        </div>
+
+        {/* Notice Banner */}
+        <div className="bg-[#0D1B2A] text-white rounded-2xl p-5 flex items-center justify-between shadow-md">
+          <div className="flex items-center gap-4">
+            <div className="text-3xl">🥽</div>
+            <div>
+              <p className="font-bold text-sm">连接 VR 头显设备获得沉浸体验</p>
+              <p className="text-xs text-slate-400 mt-0.5">支持 Meta Quest · Pico 4 · HTC Vive；也可在浏览器中 3D 预览</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2.5">
+            <button
+              onClick={() => alert('检测到承德基地实训工位 VR 设备：Pico 4 Pro 已联机')}
+              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold rounded-lg transition-colors cursor-pointer"
+            >
+              检测设备
+            </button>
+            <button
+              onClick={() => {
+                setIsVRRunning(true)
+                setSelectedCourse(COURSES[0])
+              }}
+              className="px-4 py-2 bg-[#E60026] hover:bg-[#CC0022] text-white text-xs font-bold rounded-lg transition-colors cursor-pointer"
+            >
+              进入模拟舱
+            </button>
+          </div>
+        </div>
+
+        {/* 4 Large Course Cards Grid (2x2) */}
+        <div className="grid grid-cols-2 gap-5">
+          {COURSES.map(c => (
+            <div
+              key={c.id}
+              onClick={() => {
+                setSelectedCourse(c)
+                setIsVRRunning(true)
+              }}
+              className="bg-white border border-[#EEF0F4] rounded-2xl overflow-hidden hover:border-[#E60026] hover:shadow-md transition-all cursor-pointer group"
+            >
+              <div className="relative h-44 overflow-hidden bg-slate-900">
+                <img
+                  src={c.img}
+                  alt={c.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-85"
+                />
+                <div className="absolute top-3 left-3 flex items-center gap-1.5">
+                  {c.tags.map((t, idx) => (
+                    <span
+                      key={idx}
+                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                        t.color === 'red' ? 'bg-[#E60026] text-white' :
+                        t.color === 'orange' ? 'bg-amber-600 text-white' :
+                        'bg-slate-800/80 text-white backdrop-blur-xs'
+                      }`}
+                    >
+                      {{ ...t }.text}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="p-5 space-y-2">
+                <h3 className="font-bold text-sm text-[#0B192C] group-hover:text-[#E60026] transition-colors">
+                  {c.title}
+                </h3>
+                <p className="text-xs text-slate-500 leading-relaxed line-clamp-1">
+                  {c.desc}
+                </p>
+                <div className="flex items-center justify-between text-xs text-slate-400 pt-3 border-t border-slate-100">
+                  <div className="flex items-center gap-3">
+                    <span>⏱ {c.duration}</span>
+                    <span>👤 {c.users}</span>
+                  </div>
+                  <span className="font-bold text-[#E60026]">{c.pts}</span>
+                </div>
+              </div>
             </div>
           ))}
         </div>
+      </div>
+    )
+  }
 
-        {/* Badges */}
-        <div>
-          <h2 className="text-lg font-bold text-[#1A1A2E] mb-4">成就勋章墙</h2>
-          <div className="grid grid-cols-6 gap-3">
-            {BADGES.map(b => (
-              <div key={b.name} className={`rounded-xl p-4 flex flex-col items-center gap-2 border transition-all ${
-                b.earned ? 'bg-white border-[#E8E6F5] hover:border-[#A78BFA] cursor-pointer shadow-2xs' : 'bg-[#F5F4FB] border-transparent opacity-50'
-              }`}>
-                <span className="text-3xl">{b.icon}</span>
-                <p className="text-xs font-bold text-[#1A1A2E] text-center">{b.name}</p>
-                <p className="text-[10px] text-[#7B7A96] text-center leading-tight">{b.desc}</p>
-                <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${b.earned ? 'bg-[#F0EEFF] text-[#6D4AFF]' : 'text-[#A78BFA]'}`}>
-                  {b.earned ? '已获得' : '未解锁'}
-                </span>
+  // ── Page 4: 航空知识库 (EXACT REPLICA OF SCREENSHOT 3) ─────────────────────
+  function KnowledgePage() {
+    const [selectedCat, setSelectedCat] = useState('全部')
+    const [searchQ, setSearchQ] = useState('')
+
+    const CATS = ['全部', '规章制度', '安全法规', '乘务知识', '服务技能', '航空知识', '安全培训']
+
+    const filteredDocs = KNOWLEDGE_DOCS.filter(d => {
+      if (selectedCat !== '全部' && d.cat !== selectedCat) return false
+      if (searchQ.trim() && !d.title.includes(searchQ) && !d.cat.includes(searchQ)) return false
+      return true
+    })
+
+    return (
+      <div className="p-8 space-y-6 max-w-6xl mx-auto">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-[#0B192C]">航空知识库</h1>
+            <p className="text-xs text-slate-500 mt-0.5">深圳航空官方规章与专业知识文章</p>
+          </div>
+          <span className="text-xs font-medium px-3 py-1 rounded-full bg-[#FEF9EE] text-[#B45309] border border-[#FDE68A]">
+            官方规章已收录 48 篇
+          </span>
+        </div>
+
+        {/* Search Bar */}
+        <div className="relative">
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-500">🔍</span>
+          <input
+            className="w-full pl-10 pr-4 py-3 bg-white border border-[#EEF0F4] rounded-xl text-xs text-slate-800 placeholder-slate-400 outline-none focus:border-[#E60026] transition-colors shadow-2xs"
+            placeholder="搜索规章、服务规范、知识文章..."
+            value={searchQ}
+            onChange={e => setSearchQ(e.target.value)}
+          />
+        </div>
+
+        {/* Category Filter Pills */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {CATS.map(cat => (
+            <button
+              key={cat}
+              onClick={() => setSelectedCat(cat)}
+              className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
+                selectedCat === cat
+                  ? 'bg-[#E60026] text-white font-bold shadow-xs'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
+        {/* Hero Featured Article Banner */}
+        <div 
+          onClick={() => setSelectedDoc(KNOWLEDGE_DOCS[0])}
+          className="relative rounded-2xl bg-[#0D1B2A] text-white p-7 overflow-hidden shadow-md cursor-pointer hover:opacity-95 transition-opacity"
+        >
+          <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-2xl">
+            <img
+              src="https://images.unsplash.com/photo-1506015391300-4802dc74de2e?auto=format&fit=crop&w=1200&q=80"
+              alt="Airplane wing in clouds"
+              className="w-full h-full object-cover opacity-25 mix-blend-luminosity"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0D1B2A] via-[#0D1B2A]/80 to-[#0D1B2A]/70" />
+          </div>
+
+          <div className="relative z-10 space-y-2 max-w-2xl">
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500 text-slate-950">
+              官方文件 2024 最新版
+            </span>
+            <h2 className="text-lg font-bold text-white mt-1">
+              《深圳航空乘务员服务操作手册》全文 · 2024年修订版
+            </h2>
+            <p className="text-xs text-slate-300 leading-relaxed">
+              包含 12 大服务章节，覆盖仪容仪表、餐食服务、应急处置等全部操作规范，新入职员工必读。
+            </p>
+            <div className="flex items-center gap-4 text-xs text-slate-400 pt-2">
+              <span>⏱ 45分钟</span>
+              <span>👁 18,240 阅读</span>
+              <button className="px-3.5 py-1.5 bg-[#E60026] hover:bg-[#CC0022] text-white text-xs font-bold rounded-lg transition-colors cursor-pointer">
+                立即阅读
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Document Cards Grid (2 Columns) */}
+        <div className="grid grid-cols-2 gap-4">
+          {filteredDocs.map(doc => (
+            <div
+              key={doc.id}
+              onClick={() => setSelectedDoc(doc)}
+              className="bg-white border border-[#EEF0F4] rounded-2xl p-5 hover:border-[#E60026] hover:shadow-xs transition-all cursor-pointer flex flex-col justify-between group"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-50 text-[#E60026]">
+                    {doc.cat}
+                  </span>
+                  <div className="flex items-center gap-1">
+                    {doc.badges.map((b, idx) => (
+                      <span
+                        key={idx}
+                        className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
+                          b.type === 'required' ? 'bg-rose-100 text-[#E60026]' :
+                          b.type === 'hot' ? 'bg-amber-100 text-amber-700' :
+                          b.type === 'featured' ? 'bg-blue-100 text-blue-700' :
+                          'bg-slate-100 text-slate-600'
+                        }`}
+                      >
+                        {{ ...b }.text}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <h3 className="font-bold text-xs text-[#0B192C] group-hover:text-[#E60026] transition-colors leading-snug">
+                  {doc.title}
+                </h3>
               </div>
+
+              <div className="flex items-center justify-between text-[11px] text-slate-400 pt-3 border-t border-slate-100 mt-3">
+                <span>⏱ {doc.time}</span>
+                <span>👁 {doc.reads}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  // ── Page 5: 学员排行榜 (EXACT REPLICA OF SCREENSHOT 4) ─────────────────────
+  function LeaderboardPage() {
+    const [tab, setTab] = useState<'week' | 'month' | 'all'>('week')
+
+    return (
+      <div className="p-8 space-y-6 max-w-5xl mx-auto">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-[#0B192C]">学员排行榜</h1>
+            <p className="text-xs text-slate-500 mt-0.5">入职培训积分排名，激励同行共同成长</p>
+          </div>
+          <div className="flex bg-slate-100 rounded-xl p-1 gap-1">
+            {(['week', 'month', 'all'] as const).map(t => (
+              <button
+                key={t}
+                onClick={() => setTab(t)}
+                className={`px-4 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                  tab === t ? 'bg-[#E60026] text-white' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                {t === 'week' ? '本周' : t === 'month' ? '本月' : '总榜'}
+              </button>
             ))}
           </div>
         </div>
 
-        {/* Points earning guide & Exchange */}
-        <div className="bg-white border border-[#E8E6F5] rounded-xl p-6 shadow-2xs">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xs font-bold text-[#7B7A96] uppercase tracking-wider">实训进阶权益兑换商城</h2>
-            <span className="text-xs text-[#7B7A96]">可用积分：<strong className="text-[#6D4AFF]">{points}</strong> 分</span>
+        {/* Top 3 Podium Cards */}
+        <div className="grid grid-cols-3 gap-5 items-end">
+          {/* Top 2 */}
+          <div className="bg-white border border-[#EEF0F4] rounded-2xl p-6 text-center shadow-xs space-y-2">
+            <div className="text-3xl">🥈</div>
+            <div className="w-12 h-12 rounded-full bg-rose-50 text-[#E60026] font-bold flex items-center justify-center text-sm mx-auto border border-rose-100">
+              林
+            </div>
+            <div>
+              <h3 className="font-bold text-xs text-[#0B192C]">林晓薇</h3>
+              <p className="text-[10px] text-slate-400">乘务二队</p>
+            </div>
+            <div className="pt-2">
+              <div className="text-xl font-extrabold text-[#E60026] font-mono">11,320</div>
+              <p className="text-[10px] text-slate-400">里程积分</p>
+            </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            {[
-              { act: '波音 737 官方合金机模 (1:200)', pts: 1500, icon: '✈️' },
-              { act: 'D级全动模拟机 额外体验 1 小时', pts: 2200, icon: '🥽' },
-              { act: '航校定制 防风飞行夹克与学员勋章', pts: 800, icon: '🧥' },
-              { act: '真皮飞行员日志夹 & 专属定制姓名牌', pts: 1200, icon: '📔' },
-            ].map(a => (
-              <div key={a.act} className="flex items-center justify-between p-3 border border-[#E8E6F5] rounded-xl hover:border-[#A78BFA] transition-colors">
+
+          {/* Top 1 (Deep Navy Hero Card) */}
+          <div className="bg-[#0D1B2A] text-white rounded-2xl p-7 text-center shadow-md space-y-2.5 -mt-3">
+            <div className="text-3xl">🏆</div>
+            <div className="w-14 h-14 rounded-full bg-slate-800 text-white font-bold flex items-center justify-center text-base mx-auto border border-slate-700">
+              陈
+            </div>
+            <div>
+              <h3 className="font-bold text-sm text-white">陈思远</h3>
+              <p className="text-[10px] text-slate-400">乘务一队</p>
+            </div>
+            <div className="pt-2">
+              <div className="text-2xl font-extrabold text-white font-mono">12,480</div>
+              <p className="text-[10px] text-slate-400">里程积分</p>
+            </div>
+          </div>
+
+          {/* Top 3 */}
+          <div className="bg-white border border-[#EEF0F4] rounded-2xl p-6 text-center shadow-xs space-y-2">
+            <div className="text-3xl">🥉</div>
+            <div className="w-12 h-12 rounded-full bg-amber-50 text-amber-700 font-bold flex items-center justify-center text-sm mx-auto border border-amber-100">
+              王
+            </div>
+            <div>
+              <h3 className="font-bold text-xs text-[#0B192C]">王浩然</h3>
+              <p className="text-[10px] text-slate-400">地勤部门</p>
+            </div>
+            <div className="pt-2">
+              <div className="text-xl font-extrabold text-slate-800 font-mono">10,950</div>
+              <p className="text-[10px] text-slate-400">里程积分</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Full Rankings Table */}
+        <div className="bg-white border border-[#EEF0F4] rounded-2xl overflow-hidden shadow-xs">
+          <div className="grid grid-cols-[40px_1fr_120px_90px_60px] text-[10px] font-bold text-slate-400 uppercase tracking-wider px-6 py-3 border-b border-slate-100 bg-slate-50/50">
+            <span>#</span>
+            <span>学员</span>
+            <span className="text-right">积分</span>
+            <span className="text-right">连续</span>
+            <span className="text-right">变化</span>
+          </div>
+
+          <div className="divide-y divide-slate-100 text-xs">
+            {LEADERBOARD_USERS.map(u => (
+              <div
+                key={u.rank}
+                className={`grid grid-cols-[40px_1fr_120px_90px_60px] items-center px-6 py-3.5 transition-colors ${
+                  u.isMe ? 'bg-[#FFF1F2]' : 'hover:bg-slate-50/60'
+                }`}
+              >
+                <span className={`font-bold ${u.rank <= 3 ? 'text-[#E60026]' : 'text-slate-400'}`}>
+                  {u.rank}
+                </span>
+
                 <div className="flex items-center gap-3">
-                  <span className="text-xl">{a.icon}</span>
+                  <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                    u.isMe ? 'bg-[#E60026] text-white' : 'bg-slate-100 text-slate-700'
+                  }`}>
+                    {u.avatar}
+                  </div>
                   <div>
-                    <span className="text-xs font-semibold text-[#1A1A2E] block">{a.act}</span>
-                    <span className="text-[10px] text-[#7B7A96] font-mono">{a.pts} 积分</span>
+                    <span className={`font-medium ${u.isMe ? 'text-[#E60026] font-bold' : 'text-slate-800'}`}>
+                      {u.name}
+                    </span>
+                    <p className="text-[10px] text-slate-400">{u.dept}</p>
                   </div>
                 </div>
-                <button
-                  onClick={() => {
-                    if (points < a.pts) {
-                      alert('积分不足，快去完成实训任务赚取积分吧！')
-                      return
-                    }
-                    setPoints(p => p - a.pts)
-                    confetti({ particleCount: 100, spread: 80 })
-                    alert(`兑换成功！兑换凭证码：SZ-${Math.floor(100000 + Math.random() * 900000)}，请前往承德基地训练保障部核销。`)
-                  }}
-                  disabled={points < a.pts}
-                  className="bg-[#6D4AFF] hover:bg-[#5B38E8] disabled:opacity-40 text-white text-xs px-3 py-1.5 rounded-lg font-medium transition-colors cursor-pointer"
-                >
-                  兑换
-                </button>
+
+                <span className="font-mono font-bold text-slate-800 text-right">{u.points.toLocaleString()}</span>
+                <span className="text-slate-500 text-right">🔥 {u.streak}天</span>
+                <span className={`font-bold text-right ${
+                  u.change > 0 ? 'text-emerald-600' : u.change < 0 ? 'text-rose-500' : 'text-slate-300'
+                }`}>
+                  {u.change > 0 ? `▲${u.change}` : u.change < 0 ? `▼${Math.abs(u.change)}` : '—'}
+                </span>
               </div>
             ))}
           </div>
@@ -448,113 +821,123 @@ export default function App() {
     )
   }
 
+  // ── Page 6: AI 飞行助手 (Clean Chatbot) ────────────────────────────────────
   function AIPage() {
-    const [msgs, setMsgs] = useState<ChatMsg[]>(INITIAL_MSGS)
-    const [input, setInput] = useState('')
+    const [messages, setMessages] = useState<ChatMsg[]>([
+      { role: 'ai', text: '您好，李明杰！我是深圳航空专属 AI 伴学助手。您可以向我咨询《深圳航空服务标准手册》、应急撤离 SOP、服务礼仪或进行模拟问答。', time: '刚刚' }
+    ])
+    const [query, setQuery] = useState('')
     const [loading, setLoading] = useState(false)
-    const bottomRef = useRef<HTMLDivElement>(null)
+    const chatEndRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
-      bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-    }, [msgs])
+      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }, [messages])
 
-    function send(overrideText?: string) {
-      const text = (overrideText || input).trim()
-      if (!text) return
+    const handleSend = (textToSend?: string) => {
+      const q = (textToSend || query).trim()
+      if (!q || loading) return
       const now = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
-      setMsgs(m => [...m, { role: 'user', text, time: now }])
-      if (!overrideText) setInput('')
+      setMessages(m => [...m, { role: 'user', text: q, time: now }])
+      if (!textToSend) setQuery('')
       setLoading(true)
 
       setTimeout(() => {
-        const resp = getAIResponse(text)
-        setMsgs(m => [...m, { role: 'ai', text: resp.text, time: now, refDoc: resp.ref }])
-        setLoading(false)
-      }, 750)
-    }
+        let answer = '根据《深圳航空乘务员服务操作手册》2024版规程，请务必严格遵照标准程序执行。您还可以查阅左侧知识库获取受控原文。'
+        let ref = ''
 
-    const SUGGESTIONS = ['帮我制定学习计划', '解释机器学习概念', '波音737起飞前检查单要点', '出航前绕机检查项目']
+        if (q.includes('撤离') || q.includes('应急') || q.includes('客舱')) {
+          answer = '【客舱紧急撤离规程】\n1. 听到机长指令“撤离！撤离！”后，立即开启对应应急舱门并确认滑梯充气膨胀正常。\n2. 疏散口令标准用语：“松开安全带！抛弃所有行李！脱掉高跟鞋！往这边跑！”\n3. 确认所有区域旅客撤离完毕后，乘务长携带应急物资最后离机。'
+          ref = '深圳航空服务标准手册 (2024版)'
+        } else if (q.includes('礼仪') || q.includes('服务') || q.includes('问候')) {
+          answer = '【服务礼仪规范】\n乘务员迎客时保持 15° 鞠躬，右手自然叠放在左手之上置于腹前；递送饮品时需使用托盘，热饮装杯不超过 70%，并温馨提示“请小心烫”。'
+          ref = '跨文化服务礼仪：国际航线乘客沟通'
+        } else if (q.includes('计划') || q.includes('学习')) {
+          answer = '为您规划本周实训节奏：\n• 周一/周三：客舱安全法规与理论测验\n• 周二/周四：VR 紧急撤离与机舱巡视实操演练\n• 周五/周末：知识库深读与每周排行榜冲刺！'
+        }
+
+        setMessages(m => [...m, { role: 'ai', text: answer, time: now, refDoc: ref || undefined }])
+        setLoading(false)
+      }, 650)
+    }
 
     return (
       <div className="flex flex-col h-full p-8 max-w-3xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-[#6D4AFF] flex items-center justify-center text-white font-extrabold text-sm shadow-sm">AI</div>
+        <div className="flex items-center gap-3 mb-5 pb-3 border-b border-slate-200">
+          <div className="w-9 h-9 rounded-xl bg-[#E60026] text-white flex items-center justify-center font-bold text-sm shadow-xs">
+            ✦
+          </div>
           <div>
-            <h1 className="text-xl font-bold text-[#1A1A2E]">AI 学习助手</h1>
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-              <span className="text-xs text-[#7B7A96]">智能知识库伴学模型 · 随时为你解答</span>
-            </div>
+            <h1 className="text-lg font-bold text-[#0B192C]">AI 飞行助手</h1>
+            <p className="text-[11px] text-slate-400">深圳航空知识库伴学模型 · 实时在线</p>
           </div>
         </div>
 
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto space-y-5 mb-4 pr-1">
-          {msgs.map((m, i) => (
-            <div key={i} className={`flex gap-3 ${m.role === 'user' ? 'flex-row-reverse' : ''}`}>
-              {m.role === 'ai' && (
-                <div className="w-8 h-8 rounded-lg bg-[#6D4AFF] flex items-center justify-center text-white text-xs font-extrabold shrink-0 mt-0.5">AI</div>
-              )}
-              <div className={`max-w-[80%] ${m.role === 'user' ? 'items-end' : 'items-start'} flex flex-col gap-1`}>
-                <div className={`px-4 py-3 rounded-2xl text-xs leading-relaxed whitespace-pre-line ${
-                  m.role === 'user'
-                    ? 'bg-[#6D4AFF] text-white rounded-tr-xs'
-                    : 'bg-white border border-[#E8E6F5] text-[#1A1A2E] rounded-tl-xs shadow-2xs'
-                }`}>
-                  {m.text}
-
-                  {m.refDoc && (
-                    <div 
-                      onClick={() => {
-                        const found = KNOWLEDGE_TOPICS.find(k => k.title.includes(m.refDoc!))
-                        if (found) setActiveDoc(found)
-                      }}
-                      className="mt-2.5 pt-2 border-t border-[#F0EEFF] text-[11px] text-[#6D4AFF] font-medium flex items-center gap-1 cursor-pointer hover:underline"
-                    >
-                      <span>📖 关联受控资料：{m.refDoc}</span>
-                    </div>
-                  )}
-                </div>
-                <span className="text-[10px] text-[#7B7A96] px-1">{m.time}</span>
+        <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-1">
+          {messages.map((m, idx) => (
+            <div key={idx} className={`flex gap-3 ${m.role === 'user' ? 'flex-row-reverse' : ''}`}>
+              <div className={`w-7 h-7 rounded-lg shrink-0 flex items-center justify-center text-[10px] font-bold ${
+                m.role === 'user' ? 'bg-[#E60026] text-white' : 'bg-[#0B192C] text-white'
+              }`}>
+                {m.role === 'user' ? '李' : 'AI'}
+              </div>
+              <div className={`max-w-[80%] rounded-2xl p-3.5 text-xs leading-relaxed ${
+                m.role === 'user'
+                  ? 'bg-[#E60026] text-white rounded-tr-xs'
+                  : 'bg-white border border-[#EEF0F4] text-slate-800 rounded-tl-xs shadow-2xs whitespace-pre-line'
+              }`}>
+                {m.text}
+                {m.refDoc && (
+                  <div
+                    onClick={() => {
+                      const found = KNOWLEDGE_DOCS.find(d => d.title.includes(m.refDoc!))
+                      if (found) setSelectedDoc(found)
+                    }}
+                    className="mt-2.5 pt-2 border-t border-slate-100 text-[10px] text-[#E60026] font-bold flex items-center gap-1 cursor-pointer hover:underline"
+                  >
+                    <span>📖 参考依据：{m.refDoc}</span>
+                  </div>
+                )}
               </div>
             </div>
           ))}
+
           {loading && (
-            <div className="flex gap-3">
-              <div className="w-8 h-8 rounded-lg bg-[#6D4AFF] flex items-center justify-center text-white text-xs font-bold shrink-0">AI</div>
-              <div className="bg-white border border-[#E8E6F5] px-4 py-3 rounded-2xl rounded-tl-xs flex gap-1.5 items-center">
-                {[0, 1, 2].map(i => (
-                  <span key={i} className="w-1.5 h-1.5 rounded-full bg-[#A78BFA] animate-bounce" style={{ animationDelay: `${i * 0.15}s` }} />
-                ))}
-              </div>
+            <div className="flex items-center gap-2 text-xs text-slate-400 bg-white border border-slate-200 px-3 py-2 rounded-xl w-fit">
+              <span className="animate-spin">⏳</span>
+              <span>深航 AI 助手正在检索官方规章...</span>
             </div>
           )}
-          <div ref={bottomRef} />
+          <div ref={chatEndRef} />
         </div>
 
-        {/* Suggestions */}
+        {/* Suggestion Prompts */}
         <div className="flex gap-2 flex-wrap mb-3">
-          {SUGGESTIONS.map(s => (
-            <button key={s} onClick={() => send(s)}
-              className="text-xs text-[#6D4AFF] bg-[#F0EEFF] hover:bg-[#E8E0FF] px-3 py-1.5 rounded-full font-medium transition-colors cursor-pointer">
+          {['客舱紧急撤离程序要点', '服务礼仪与问候规范', '机上医疗急救流程', '制定本周学习计划'].map(s => (
+            <button
+              key={s}
+              onClick={() => handleSend(s)}
+              className="text-xs text-[#E60026] bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-full font-medium transition-colors cursor-pointer"
+            >
               {s}
             </button>
           ))}
         </div>
 
-        {/* Input */}
-        <div className="flex gap-3 bg-white border border-[#E8E6F5] rounded-xl p-1.5 focus-within:border-[#6D4AFF] transition-colors shadow-2xs">
+        {/* Chat Input */}
+        <div className="flex gap-2 bg-white border border-[#EEF0F4] rounded-xl p-1.5 focus-within:border-[#E60026] transition-colors shadow-2xs">
           <input
-            className="flex-1 px-3 py-2 text-xs text-[#1A1A2E] outline-none bg-transparent placeholder:text-[#C4C0E8]"
-            placeholder="输入你的问题或学习需求..."
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && send()}
+            className="flex-1 px-3 py-2 text-xs text-slate-800 outline-none bg-transparent placeholder:text-slate-400"
+            placeholder="输入您要咨询的专业问题（如：紧急撤离口令、餐食服务规范）..."
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleSend()}
           />
-          <button onClick={() => send()}
-            className="bg-[#6D4AFF] hover:bg-[#5B38E8] text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer disabled:opacity-50"
-            disabled={!input.trim() || loading}>
+          <button
+            onClick={() => handleSend()}
+            disabled={!query.trim() || loading}
+            className="bg-[#E60026] hover:bg-[#CC0022] disabled:opacity-40 text-white text-xs px-4 py-2 rounded-lg font-bold transition-colors cursor-pointer"
+          >
             发送
           </button>
         </div>
@@ -562,321 +945,7 @@ export default function App() {
     )
   }
 
-  function VRPage() {
-    const activeScenario = selectedVRScenario || VR_COURSES[0]
-
-    return (
-      <div className="p-8 space-y-8 max-w-5xl mx-auto">
-        <div className="flex items-end justify-between">
-          <div>
-            <h1 className="text-3xl font-extrabold text-[#1A1A2E]">VR 沉浸学习与情景仿真</h1>
-            <p className="text-[#7B7A96] text-xs mt-1">突破空间限制，在虚拟现实座舱与复杂场景中深度演练</p>
-          </div>
-          <div className="bg-[#F0EEFF] text-[#6D4AFF] px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5">
-            <span>◉</span> {VR_COURSES.length} 个实训情景可用
-          </div>
-        </div>
-
-        {/* Device notice */}
-        <div className="bg-gradient-to-r from-[#1A1A2E] to-[#2D2B5E] rounded-xl p-5 flex items-center justify-between text-white shadow-xs">
-          <div className="flex items-center gap-4">
-            <span className="text-3xl">🥽</span>
-            <div>
-              <p className="font-bold text-sm">连接 VR 头显以获得完整 6-DOF 交互体验</p>
-              <p className="text-white/60 text-xs mt-0.5">也可在浏览器中以 3D HUD 仿真仪表模式快速预览</p>
-            </div>
-          </div>
-          <button 
-            onClick={() => alert('承德基地 VR 仿真硬件连接检测通过：4K 双目渲染 · 延迟 < 12ms')}
-            className="bg-[#6D4AFF] hover:bg-[#5B38E8] text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors cursor-pointer"
-          >
-            检测设备
-          </button>
-        </div>
-
-        {/* VR Viewport Canvas (留空的高科技视界UI) */}
-        <div className="relative h-72 rounded-2xl bg-[#0B0D1B] border border-[#2D2B5E] overflow-hidden p-6 flex flex-col justify-between text-white shadow-lg">
-          <div className="flex items-center justify-between text-xs font-mono text-white/60 z-10">
-            <div className="flex items-center gap-3">
-              <span className="text-[#A78BFA] font-bold">VR HUD SIMULATOR</span>
-              <span>·</span>
-              <span>情景：{activeScenario.title}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className={`w-2 h-2 rounded-full ${isVRRunning ? 'bg-green-400 animate-ping' : 'bg-[#A78BFA]'}`} />
-              <span className="text-xs">{isVRRunning ? '仿真引擎运行中' : '视界待载入'}</span>
-            </div>
-          </div>
-
-          <div className="relative z-10 text-center my-auto space-y-3">
-            {!isVRRunning ? (
-              <>
-                <h3 className="text-lg font-bold text-white">{activeScenario.title}</h3>
-                <p className="text-xs text-white/60 max-w-md mx-auto">{activeScenario.desc}</p>
-                <button
-                  onClick={() => {
-                    setIsVRRunning(true)
-                    confetti({ particleCount: 50, spread: 60 })
-                  }}
-                  className="bg-[#6D4AFF] hover:bg-[#5B38E8] text-white text-xs font-bold px-6 py-2.5 rounded-full inline-flex items-center gap-2 shadow-md cursor-pointer transition-all hover:scale-105"
-                >
-                  <span>▶</span> 载入并启动 VR 场景
-                </button>
-              </>
-            ) : (
-              <div className="space-y-3">
-                <div className="inline-flex items-center gap-6 bg-white/10 px-6 py-2.5 rounded-xl backdrop-blur-md font-mono text-xs text-[#A78BFA]">
-                  <span>高度: {activeScenario.hudData.alt}</span>
-                  <span>空速: {activeScenario.hudData.speed}</span>
-                  <span>航向: {activeScenario.hudData.heading}</span>
-                  <span>推力: {activeScenario.hudData.throttle}</span>
-                </div>
-                <p className="text-xs text-green-400 font-bold">✓ 沉浸式视界已就绪，当前正在模拟实训科目中</p>
-                <button
-                  onClick={() => setIsVRRunning(false)}
-                  className="bg-red-500/80 hover:bg-red-500 text-white text-xs px-4 py-1.5 rounded-lg transition-colors cursor-pointer"
-                >
-                  结束体验
-                </button>
-              </div>
-            )}
-          </div>
-
-          <div className="flex items-center justify-between text-[10px] font-mono text-white/50 z-10 pt-2 border-t border-white/10">
-            <span>难度等级: {activeScenario.difficulty}</span>
-            <span>建议时长: {activeScenario.duration}</span>
-            <span>获得奖励: +120 积分</span>
-          </div>
-        </div>
-
-        {/* VR Scenario Selection Cards */}
-        <div>
-          <h2 className="text-base font-bold text-[#1A1A2E] mb-3">可选实训情景预设</h2>
-          <div className="grid grid-cols-2 gap-4">
-            {VR_COURSES.map((v) => (
-              <div
-                key={v.id}
-                onClick={() => {
-                  setSelectedVRScenario(v)
-                  setIsVRRunning(false)
-                }}
-                className={`rounded-xl overflow-hidden border cursor-pointer transition-all duration-200 ${
-                  activeScenario.id === v.id
-                    ? 'border-[#6D4AFF] shadow-md shadow-[#6D4AFF]/10 ring-2 ring-[#F0EEFF]'
-                    : 'border-[#E8E6F5] hover:border-[#A78BFA] bg-white'
-                }`}
-              >
-                <div className="p-4 bg-white">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-[10px] font-bold text-[#6D4AFF] bg-[#F0EEFF] px-2 py-0.5 rounded-full">{v.cat}</span>
-                    <span className="text-[10px] text-[#7B7A96]">{v.difficulty}</span>
-                  </div>
-                  <h3 className="font-bold text-[#1A1A2E] text-xs mb-1">{v.title}</h3>
-                  <p className="text-[11px] text-[#7B7A96] mb-3 line-clamp-2">{v.desc}</p>
-                  <div className="flex items-center justify-between text-[11px] text-[#7B7A96] pt-2 border-t border-[#F0EEFF]">
-                    <span>⏱ {v.duration}</span>
-                    <span className="text-[#6D4AFF] font-bold">
-                      {activeScenario.id === v.id ? '当前选中 ●' : '点击载入'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  function KnowledgePage() {
-    const [search, setSearch] = useState('')
-    const [cat, setCat] = useState('全部')
-    const CATS = ['全部', '人工智能', '飞行规章', '深度学习', 'Web3']
-    const filtered = KNOWLEDGE_TOPICS.filter(t =>
-      (cat === '全部' || t.cat === cat) &&
-      (search === '' || t.title.includes(search) || t.cat.includes(search) || t.desc.includes(search))
-    )
-
-    return (
-      <div className="p-8 space-y-6 max-w-5xl mx-auto">
-        <div>
-          <h1 className="text-3xl font-extrabold text-[#1A1A2E]">知识库</h1>
-          <p className="text-[#7B7A96] text-xs mt-1">精选专业技术手册与前沿文章，拓展学科与操作视野</p>
-        </div>
-
-        {/* Search */}
-        <div className="relative">
-          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A78BFA]">⌕</span>
-          <input
-            className="w-full pl-10 pr-4 py-3 bg-white border border-[#E8E6F5] rounded-xl text-xs text-[#1A1A2E] outline-none focus:border-[#6D4AFF] transition-colors placeholder:text-[#C4C0E8] shadow-2xs"
-            placeholder="搜索知识文章、专业手册、SOP规程..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
-        </div>
-
-        {/* Categories */}
-        <div className="flex gap-2 flex-wrap">
-          {CATS.map(c => (
-            <button key={c} onClick={() => setCat(c)}
-              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                cat === c ? 'bg-[#6D4AFF] text-white shadow-xs' : 'bg-[#F0EEFF] text-[#6D4AFF] hover:bg-[#E8E0FF]'
-              }`}>
-              {c}
-            </button>
-          ))}
-        </div>
-
-        {/* Featured article */}
-        <div 
-          onClick={() => setActiveDoc(KNOWLEDGE_TOPICS[0])}
-          className="bg-gradient-to-br from-[#1A1A2E] to-[#2D2B5E] rounded-xl overflow-hidden relative cursor-pointer hover:opacity-95 transition-opacity shadow-md"
-        >
-          <div className="relative p-8 text-white">
-            <span className="text-xs font-bold text-[#A78BFA] uppercase tracking-wider">本周精选受控研讨</span>
-            <h2 className="text-xl font-extrabold mt-2 mb-2 max-w-lg">神经网络架构设计与反向传播算法深度解析</h2>
-            <p className="text-white/70 text-xs max-w-md">详细推导多层前馈网络、自适应学习率优化器以及特情决策系统中的鲁棒性保障。</p>
-            <div className="flex items-center gap-4 mt-4">
-              <span className="text-white/60 text-xs">⏱ 8 分钟阅读</span>
-              <span className="text-white/60 text-xs">👁 3,420 次查阅</span>
-              <span className="bg-[#6D4AFF] text-white text-xs px-3.5 py-1.5 rounded-full font-semibold">开始阅读</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Articles grid */}
-        <div className="grid grid-cols-2 gap-4">
-          {filtered.map((a) => (
-            <div
-              key={a.id}
-              onClick={() => setActiveDoc(a)}
-              className="bg-white border border-[#E8E6F5] rounded-xl p-5 hover:border-[#A78BFA] hover:shadow-sm transition-all cursor-pointer group"
-            >
-              <div className="flex items-start justify-between mb-2.5">
-                <span className="text-xs font-semibold text-[#6D4AFF] bg-[#F0EEFF] px-2.5 py-0.5 rounded-full">{a.cat}</span>
-                {a.tag && (
-                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-                    a.tag === '热门' ? 'bg-orange-50 text-orange-500' :
-                    a.tag === '精选' ? 'bg-[#F0EEFF] text-[#6D4AFF]' :
-                    'bg-green-50 text-green-600'
-                  }`}>
-                    {a.tag}
-                  </span>
-                )}
-              </div>
-              <h3 className="font-bold text-[#1A1A2E] text-xs mb-2 leading-snug group-hover:text-[#6D4AFF] transition-colors">{a.title}</h3>
-              <p className="text-[11px] text-[#7B7A96] mb-3 line-clamp-2">{a.desc}</p>
-              <div className="flex items-center justify-between text-[11px] text-[#7B7A96] pt-2 border-t border-[#F0EEFF]">
-                <span>⏱ {a.time}</span>
-                <span>👁 {a.reads.toLocaleString()} 阅读</span>
-              </div>
-            </div>
-          ))}
-          {filtered.length === 0 && (
-            <div className="col-span-2 text-center py-12 text-[#A78BFA]">未找到相关文章</div>
-          )}
-        </div>
-      </div>
-    )
-  }
-
-  function LeaderboardPage() {
-    const [period, setPeriod] = useState<'week' | 'month' | 'all'>('week')
-    return (
-      <div className="p-8 space-y-8 max-w-4xl mx-auto">
-        <div className="flex items-end justify-between">
-          <div>
-            <h1 className="text-3xl font-extrabold text-[#1A1A2E]">排行榜</h1>
-            <p className="text-[#7B7A96] text-xs mt-1">与学员共同实训竞技，持续激发成长动力</p>
-          </div>
-          <div className="flex bg-[#F0EEFF] rounded-xl p-1 gap-1">
-            {(['week', 'month', 'all'] as const).map(p => (
-              <button key={p} onClick={() => setPeriod(p)}
-                className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  period === p ? 'bg-[#6D4AFF] text-white shadow-xs' : 'text-[#6D4AFF] hover:bg-[#E8E0FF]'
-                }`}>
-                {p === 'week' ? '本周' : p === 'month' ? '本月' : '总榜'}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Top 3 podium */}
-        <div className="grid grid-cols-3 gap-4 items-end">
-          {[leaderboard[1], leaderboard[0], leaderboard[2]].map((u, i) => (
-            <div key={u.rank} className={`rounded-xl p-5 text-center border transition-all ${
-              i === 1 ? 'bg-gradient-to-b from-[#6D4AFF] to-[#5B38E8] text-white border-transparent -mt-4 pb-8 shadow-md' :
-              'bg-white border-[#E8E6F5] shadow-2xs'
-            }`}>
-              <div className="text-3xl mb-2">{u.badge || (i === 0 ? '🥈' : '🥉')}</div>
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold mx-auto mb-2 ${
-                i === 1 ? 'bg-white/20 text-white' : 'bg-[#F0EEFF] text-[#6D4AFF]'
-              }`}>{u.avatar}</div>
-              <p className={`font-bold text-xs ${i === 1 ? 'text-white' : 'text-[#1A1A2E]'}`}>{u.name}</p>
-              <p className={`text-xl font-extrabold mt-1 font-mono ${i === 1 ? 'text-white' : 'text-[#6D4AFF]'}`}>
-                {u.points.toLocaleString()}
-              </p>
-              <p className={`text-[11px] mt-0.5 ${i === 1 ? 'text-white/70' : 'text-[#7B7A96]'}`}>积分</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Full table */}
-        <div className="bg-white border border-[#E8E6F5] rounded-xl overflow-hidden shadow-2xs">
-          <div className="grid grid-cols-[40px_1fr_100px_80px_60px_60px] text-[10px] font-bold text-[#7B7A96] uppercase tracking-wider px-5 py-3 border-b border-[#E8E6F5] bg-[#FAFAFE]">
-            <span>#</span><span>实训学员</span><span className="text-right">积分</span><span className="text-right">连续打卡</span><span className="text-right">变化</span><span className="text-right">点赞</span>
-          </div>
-          <div className="divide-y divide-[#F0EEFF]">
-            {leaderboard.map(u => (
-              <div key={u.rank} className={`grid grid-cols-[40px_1fr_100px_80px_60px_60px] items-center px-5 py-3.5 transition-colors ${
-                (u as any).isMe ? 'bg-[#F0EEFF]' : 'hover:bg-[#FAFAFE]'
-              }`}>
-                <span className={`text-xs font-bold ${u.rank <= 3 ? 'text-[#6D4AFF]' : 'text-[#7B7A96]'}`}>{u.rank}</span>
-                <div className="flex items-center gap-3">
-                  <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold ${
-                    (u as any).isMe ? 'bg-[#6D4AFF] text-white' : 'bg-[#F0EEFF] text-[#6D4AFF]'
-                  }`}>{u.avatar}</div>
-                  <div>
-                    <p className={`text-xs font-semibold ${(u as any).isMe ? 'text-[#6D4AFF] font-bold' : 'text-[#1A1A2E]'}`}>
-                      {u.name}
-                    </p>
-                    <p className="text-[10px] text-[#7B7A96]">🔥 {u.streak}天</p>
-                  </div>
-                </div>
-                <p className="text-xs font-bold text-[#1A1A2E] text-right font-mono">{u.points.toLocaleString()}</p>
-                <p className="text-xs text-[#7B7A96] text-right font-mono">{u.streak}天</p>
-                <p className={`text-xs font-bold text-right font-mono ${
-                  u.change > 0 ? 'text-green-500' : u.change < 0 ? 'text-red-400' : 'text-[#A78BFA]'
-                }`}>
-                  {u.change > 0 ? `▲${u.change}` : u.change < 0 ? `▼${Math.abs(u.change)}` : '—'}
-                </p>
-                <button
-                  onClick={() => handleLikeUser(u.rank)}
-                  className="text-right text-xs hover:scale-110 transition-transform cursor-pointer"
-                  title="点赞"
-                >
-                  ❤️ {u.likes}
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* My position callout */}
-        <div className="bg-[#F0EEFF] border border-[#C4C0E8] rounded-xl p-5 flex items-center justify-between">
-          <div>
-            <p className="font-bold text-[#1A1A2E] text-sm">你排名第 6 位</p>
-            <p className="text-xs text-[#7B7A96] mt-0.5">再获得 <span className="text-[#6D4AFF] font-bold">480 积分</span> 即可超越李明杰，晋升前 5！</p>
-          </div>
-          <div className="text-right">
-            <p className="text-2xl font-extrabold text-[#6D4AFF] font-mono">{points.toLocaleString()}</p>
-            <p className="text-xs text-[#7B7A96]">当前积分</p>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
+  // ── Render Current Page ───────────────────────────────────────────────────
   const PAGES: Record<Page, React.ReactNode> = {
     home: <HomePage />,
     points: <PointsPage />,
@@ -887,165 +956,205 @@ export default function App() {
   }
 
   return (
-    <div className="flex h-full bg-[#FAFAFE]" style={{ fontFamily: "'Outfit', sans-serif" }}>
-      {/* Sidebar */}
-      <aside className="w-56 flex flex-col bg-white border-r border-[#E8E6F5] shrink-0 select-none">
-        {/* Logo */}
-        <div className="px-5 py-5 border-b border-[#E8E6F5]">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-[#6D4AFF] flex items-center justify-center text-white font-extrabold text-sm shadow-xs">
-              L
-            </div>
-            <div>
-              <p className="font-extrabold text-[#1A1A2E] text-sm leading-tight">LearnVerse</p>
-              <p className="text-[10px] text-[#A78BFA] font-medium">新员工数字化实训平台</p>
+    <div className="flex h-full bg-[#F8F9FB] select-none font-sans">
+      {/* Sidebar matching Figma */}
+      <aside className="w-60 flex flex-col bg-[#0B192C] text-slate-300 shrink-0 justify-between">
+        <div>
+          {/* Logo */}
+          <div className="px-5 py-5 border-b border-slate-800/80">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-[#E60026] text-white flex items-center justify-center font-bold text-sm shadow-md">
+                ✈
+              </div>
+              <div>
+                <p className="font-bold text-white text-sm leading-tight">深圳航空</p>
+                <p className="text-[10px] text-slate-400">入职培训系统</p>
+              </div>
             </div>
           </div>
+
+          {/* Navigation items */}
+          <nav className="px-3 py-4 space-y-1.5">
+            {NAV_ITEMS.map(n => (
+              <button
+                key={n.id}
+                onClick={() => setPage(n.id)}
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all duration-150 cursor-pointer ${
+                  page === n.id
+                    ? 'bg-[#E60026] text-white font-bold shadow-sm'
+                    : 'text-slate-400 hover:bg-slate-800/80 hover:text-white'
+                }`}
+              >
+                {n.iconType === 'home' && (
+                  <svg className="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                  </svg>
+                )}
+                {n.iconType === 'points' && (
+                  <svg className="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                )}
+                {n.iconType === 'ai' && (
+                  <svg className="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.38-1 1.72V7h4a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-8a3 3 0 0 1 3-3h4V5.72c-.6-.34-1-.98-1-1.72a2 2 0 0 1 2-2m-3 8a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m6 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-6 5h6v1H9v-1z"/>
+                  </svg>
+                )}
+                {n.iconType === 'vr' && (
+                  <svg className="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M20 7H4a3 3 0 0 0-3 3v4a3 3 0 0 0 3 3h4.3a2 2 0 0 0 1.7-1l1-1.5a1 1 0 0 1 1.6 0l1 1.5a2 2 0 0 0 1.7 1H20a3 3 0 0 0 3-3v-4a3 3 0 0 0-3-3zm-13 7a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm10 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/>
+                  </svg>
+                )}
+                {n.iconType === 'knowledge' && (
+                  <svg className="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
+                  </svg>
+                )}
+                {n.iconType === 'leaderboard' && (
+                  <svg className="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+                  </svg>
+                )}
+                <span>{n.label}</span>
+              </button>
+            ))}
+          </nav>
         </div>
 
-        {/* Navigation items */}
-        <nav className="flex-1 px-3 py-4 space-y-1">
-          {NAV_ITEMS.map(n => (
-            <button
-              key={n.id}
-              onClick={() => setPage(n.id)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-150 cursor-pointer ${
-                page === n.id
-                  ? 'bg-[#6D4AFF] text-white shadow-xs'
-                  : 'text-[#7B7A96] hover:bg-[#F0EEFF] hover:text-[#6D4AFF]'
-              }`}
-            >
-              <span className="text-base w-5 text-center">{n.icon}</span>
-              {n.label}
-            </button>
-          ))}
-        </nav>
-
         {/* User Pill Footer */}
-        <div className="px-3 py-4 border-t border-[#E8E6F5]">
-          <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[#F0EEFF] cursor-pointer transition-colors">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#6D4AFF] to-[#A78BFA] flex items-center justify-center text-white text-xs font-bold shrink-0">
-              ZH
+        <div className="p-4 border-t border-slate-800/80 space-y-3">
+          <div>
+            <div className="flex items-center justify-between text-[10px] text-slate-400 mb-1 font-medium">
+              <span>入职进度</span>
+              <span className="text-slate-300">38%</span>
+            </div>
+            <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden flex">
+              <div className="w-[38%] h-full bg-gradient-to-r from-[#E60026] to-[#F59E0B]" />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2.5 pt-1">
+            <div className="w-7 h-7 rounded-full bg-[#E60026] text-white flex items-center justify-center font-bold text-xs shrink-0">
+              李
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-bold text-[#1A1A2E] truncate">张晓航</p>
-              <p className="text-[10px] text-[#A78BFA] truncate font-medium">初级副驾驶 · 白金学者</p>
+              <p className="text-xs font-bold text-white truncate">李明杰</p>
+              <p className="text-[10px] text-slate-400 truncate">ZH · 乘务一队新学员</p>
             </div>
-            <span className="text-[#C4C0E8] text-xs">⋯</span>
           </div>
         </div>
       </aside>
 
-      {/* Main content viewport */}
+      {/* Main Viewport */}
       <main className="flex-1 overflow-y-auto">
         {PAGES[page]}
       </main>
 
+      {/* Floating Question Help Circle (?) in bottom right */}
+      <div
+        onClick={() => alert('深圳航空数字化学习中心 · 服务热线：400-777-9999\n当前版本：v2.4 (2026)')}
+        className="fixed bottom-5 right-5 w-8 h-8 rounded-full bg-[#0B192C] hover:bg-[#E60026] text-white font-bold text-xs flex items-center justify-center shadow-lg cursor-pointer transition-colors z-40"
+        title="帮助与支持"
+      >
+        ?
+      </div>
+
       {/* ── Interactive Modals ── */}
-      {/* 1. Course Details & Quiz Modal */}
-      {activeCourse && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fadeIn">
-          <div className="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-[#E8E6F5] space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-[#E8E6F5]">
+      {/* VR Cockpit Simulation Modal */}
+      {isVRRunning && selectedCourse && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+          <div className="bg-[#0D1B2A] rounded-2xl max-w-xl w-full p-6 text-white space-y-4 border border-slate-700 shadow-2xl">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold px-2 py-0.5 rounded bg-[#F0EEFF] text-[#6D4AFF]">
-                  {activeCourse.category}
-                </span>
-                <h3 className="font-bold text-base text-[#1A1A2E]">{activeCourse.title}</h3>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#E60026]">VR SIMULATION</span>
+                <h3 className="font-bold text-sm">{selectedCourse.title}</h3>
               </div>
-              <button onClick={() => setActiveCourse(null)} className="text-[#7B7A96] hover:text-[#1A1A2E] text-sm cursor-pointer">✕</button>
+              <button onClick={() => setIsVRRunning(false)} className="text-slate-400 hover:text-white cursor-pointer">✕</button>
             </div>
 
-            <p className="text-xs text-[#7B7A96] leading-relaxed">{activeCourse.description}</p>
-
-            <div className="h-44 rounded-xl bg-[#1A1A2E] flex flex-col items-center justify-center text-white relative overflow-hidden">
-              <div className="w-12 h-12 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-xl cursor-pointer transition-transform hover:scale-110">
-                ▶
+            <div className="h-48 rounded-xl bg-black border border-slate-800 relative overflow-hidden flex flex-col justify-between p-4 font-mono text-xs text-blue-300">
+              <div className="flex justify-between">
+                <span>SIM ENGINE: ACTIVE</span>
+                <span className="text-emerald-400">90.0 FPS</span>
               </div>
-              <p className="text-xs text-white/70 mt-2">第 04 讲：核心操作程序仿真录屏</p>
-            </div>
-
-            <div className="p-3 bg-[#F8F7FF] rounded-xl border border-[#E8E6F5] space-y-2">
-              <p className="text-xs font-bold text-[#1A1A2E]">随堂测验：标准流程中首要安全复核要点是？</p>
-              <div className="space-y-1.5 text-xs">
-                <label className="flex items-center gap-2 p-2 rounded-lg bg-white border border-[#E8E6F5] cursor-pointer hover:border-[#6D4AFF]">
-                  <input type="radio" name="quiz" defaultChecked />
-                  <span>A. 检查备用高度表指示并调定当前场压 QNH (正确)</span>
-                </label>
-                <label className="flex items-center gap-2 p-2 rounded-lg bg-white border border-[#E8E6F5] cursor-pointer hover:border-[#6D4AFF]">
-                  <input type="radio" name="quiz" />
-                  <span>B. 直接断开主电源供电</span>
-                </label>
+              <div className="text-center my-auto space-y-2">
+                <p className="text-base font-bold text-white tracking-wider">正在运行全景模拟实操...</p>
+                <div className="flex justify-center gap-4 text-[11px] text-slate-400">
+                  <span>客舱压强: 8.2 PSI</span>
+                  <span>机组状态: NORMAL</span>
+                  <span>环境音效: 开启</span>
+                </div>
+              </div>
+              <div className="flex justify-between text-[10px] text-slate-500">
+                <span>科目学时: {selectedCourse.duration}</span>
+                <span>实训加分: {selectedCourse.pts}</span>
               </div>
             </div>
 
             <div className="flex items-center justify-between pt-2">
-              <span className="text-xs text-[#7B7A96]">完成学习可获 +50 积分</span>
-              <div className="flex gap-2">
-                <button onClick={() => setActiveCourse(null)} className="px-4 py-2 rounded-lg text-xs font-medium text-[#7B7A96] hover:bg-slate-100 cursor-pointer">稍后</button>
-                <button
-                  onClick={() => {
-                    setPoints(p => p + 50)
-                    confetti({ particleCount: 80, spread: 70 })
-                    alert(`恭喜完成《${activeCourse.title}》章节，已发放 50 积分！`)
-                    setActiveCourse(null)
-                  }}
-                  className="px-4 py-2 bg-[#6D4AFF] hover:bg-[#5B38E8] text-white text-xs font-bold rounded-lg cursor-pointer"
-                >
-                  完成学习并领取积分
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 2. Knowledge Document Modal */}
-      {activeDoc && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-[#E8E6F5] space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-[#E8E6F5]">
-              <div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#F0EEFF] text-[#6D4AFF]">{activeDoc.cat}</span>
-                <h3 className="font-bold text-base text-[#1A1A2E] mt-1">{activeDoc.title}</h3>
-              </div>
-              <button onClick={() => setActiveDoc(null)} className="text-[#7B7A96] hover:text-[#1A1A2E] text-sm cursor-pointer">✕</button>
-            </div>
-
-            <div className="max-h-72 overflow-y-auto p-4 bg-[#FAFAFE] rounded-xl border border-[#E8E6F5] text-xs leading-relaxed text-[#1A1A2E] space-y-3 whitespace-pre-line font-sans">
-              {activeDoc.content}
-            </div>
-
-            <div className="flex items-center justify-between pt-2">
-              <span className="text-xs text-[#7B7A96]">受控编号: CCAR-2026-{activeDoc.id}</span>
+              <span className="text-xs text-slate-400">请使用手柄或鼠标核对客舱应急设备</span>
               <button
                 onClick={() => {
-                  alert(`《${activeDoc.title}》离线手册下载成功！`)
-                  setActiveDoc(null)
+                  setPoints(p => p + 120)
+                  confetti({ particleCount: 70, spread: 60 })
+                  alert(`恭喜完成《${selectedCourse.title}》实训科目！已奖励 120 里程积分！`)
+                  setIsVRRunning(false)
                 }}
-                className="px-4 py-2 bg-[#6D4AFF] hover:bg-[#5B38E8] text-white text-xs font-bold rounded-lg cursor-pointer"
+                className="px-4 py-2 bg-[#E60026] hover:bg-[#CC0022] text-white text-xs font-bold rounded-lg cursor-pointer"
               >
-                下载离线文档
+                完成本次实训并结算积分
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* 3. Check-in Modal */}
+      {/* Document Reader Modal */}
+      {selectedDoc && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-50 text-[#E60026]">{selectedDoc.cat}</span>
+                <h3 className="font-bold text-base text-[#0B192C] mt-1">{selectedDoc.title}</h3>
+              </div>
+              <button onClick={() => setSelectedDoc(null)} className="text-slate-400 hover:text-slate-600 cursor-pointer">✕</button>
+            </div>
+
+            <div className="max-h-72 overflow-y-auto p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs leading-relaxed text-slate-800 space-y-2 whitespace-pre-line">
+              {selectedDoc.content}
+            </div>
+
+            <div className="flex items-center justify-between pt-2 text-xs text-slate-400">
+              <span>阅读学时: {selectedDoc.time} · 受控版本: 2024-V3</span>
+              <button
+                onClick={() => {
+                  alert(`《${selectedDoc.title}》离线 PDF 已保存至本地！`)
+                  setSelectedDoc(null)
+                }}
+                className="px-4 py-2 bg-[#E60026] hover:bg-[#CC0022] text-white text-xs font-bold rounded-lg cursor-pointer"
+              >
+                下载离线受控版
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Check-in Celebration Modal */}
       {isCheckinModalOpen && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl border border-[#E8E6F5]">
-            <span className="text-4xl">🔥</span>
+          <div className="bg-white rounded-2xl max-w-xs w-full p-6 text-center space-y-4 shadow-2xl border border-slate-200">
+            <div className="text-4xl">🔥</div>
             <div>
-              <h3 className="text-lg font-bold text-[#1A1A2E]">打卡签到成功！</h3>
-              <p className="text-xs text-[#7B7A96] mt-1">已连续实训 <span className="text-[#6D4AFF] font-bold">{streakDays}</span> 天 · 获得 +30 积分奖励</p>
+              <h3 className="text-base font-bold text-[#0B192C]">签到打卡成功！</h3>
+              <p className="text-xs text-slate-500 mt-1">已连续实训 <strong className="text-[#E60026]">{streakDays}</strong> 天 · 获得 +30 里程积分</p>
             </div>
             <button
               onClick={() => setIsCheckinModalOpen(false)}
-              className="w-full py-2 bg-[#6D4AFF] hover:bg-[#5B38E8] text-white text-xs font-bold rounded-lg cursor-pointer"
+              className="w-full py-2 bg-[#E60026] hover:bg-[#CC0022] text-white text-xs font-bold rounded-lg cursor-pointer"
             >
-              太棒了
+              确定
             </button>
           </div>
         </div>

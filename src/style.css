@@ -1,72 +1,44 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=PingFang+SC:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import 'tailwindcss';
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-border: var(--border);
-  --color-ring: var(--ring);
-  --radius-DEFAULT: var(--radius);
-}
-
 :root {
-  --background: #FFFFFF;
-  --foreground: #1A1A2E;
-  --card: #FAFAFE;
-  --card-foreground: #1A1A2E;
-  --primary: #6D4AFF;
-  --primary-foreground: #FFFFFF;
-  --secondary: #F0EEFF;
-  --secondary-foreground: #6D4AFF;
-  --muted: #F5F4FB;
-  --muted-foreground: #7B7A96;
-  --accent: #A78BFA;
-  --accent-foreground: #1A1A2E;
-  --border: #E8E6F5;
-  --ring: #6D4AFF;
-  --radius: 10px;
+  --primary-red: #E60026;
+  --primary-red-hover: #CC0022;
+  --sidebar-navy: #0B192C;
+  --card-dark: #0D1B2A;
+  --bg-main: #F8F9FB;
+  --text-dark: #1A1A2E;
+  --text-muted: #64748B;
+  --border-light: #EEF0F4;
 }
 
 html, body, #root {
   height: 100%;
-  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background-color: #FAFAFE;
-  color: #1A1A2E;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", 'Outfit', sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-dark);
+  overflow: hidden;
 }
 
 * {
-  scrollbar-width: thin;
-  scrollbar-color: transparent transparent;
+  box-sizing: border-box;
 }
 
-*:hover {
-  scrollbar-color: #E8E6F5 transparent;
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
 }
 
-*::-webkit-scrollbar {
-  width: 4px;
-}
-
-*::-webkit-scrollbar-track {
+::-webkit-scrollbar-track {
   background: transparent;
 }
 
-*::-webkit-scrollbar-thumb {
-  background: transparent;
-  border-radius: 4px;
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 9999px;
 }
 
-*:hover::-webkit-scrollbar-thumb {
-  background: #E8E6F5;
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
 }
