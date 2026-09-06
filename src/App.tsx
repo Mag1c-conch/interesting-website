@@ -331,7 +331,7 @@ const LEADERBOARD_USERS = [
   { rank: 2, name: '林晓薇', dept: '地面服务部', avatar: '林', points: 11320, streak: 38, change: 1 },
   { rank: 3, name: '王浩然', dept: '飞行运行部', avatar: '王', points: 10950, streak: 30, change: -1 },
   { rank: 4, name: '张雨桐', dept: '机务维修部', avatar: '张', points: 9840, streak: 27, change: 2 },
-  { rank: 5, name: '李明杰', dept: '航空安全部', avatar: '李', points: 9210, streak: 22, change: -1 },
+  { rank: 5, name: '张晓航', dept: '航空安全部', avatar: '张', points: 9210, streak: 22, change: -1 },
   { rank: 6, name: '你 (我)', dept: '客舱服务部', avatar: '你', points: 8760, streak: 18, change: 3, isMe: true },
   { rank: 7, name: '赵诗涵', dept: '乘务二队', avatar: '赵', points: 8340, streak: 14, change: -2 },
 ]
@@ -369,6 +369,22 @@ export default function App() {
   const [selectedDoc, setSelectedDoc] = useState<KnowledgeDoc | null>(null)
   const [isCheckinModalOpen, setIsCheckinModalOpen] = useState(false)
   const [isVRRunning, setIsVRRunning] = useState(false)
+  const [customAlert, setCustomAlert] = useState<{
+    title: string
+    content: string
+    icon?: string
+    tag?: string
+    confirmText?: string
+  } | null>(null)
+  const showAlert = (alertConfig: {
+    title: string
+    content: string
+    icon?: string
+    tag?: string
+    confirmText?: string
+  }) => {
+    setCustomAlert(alertConfig)
+  }
 
   // Daily Tasks
   const [dailyTasks, setDailyTasks] = useState([
@@ -423,7 +439,7 @@ export default function App() {
                 <span className="text-xs text-slate-300">持续实训 18 天</span>
               </div>
               <h2 className="text-2xl font-black text-white tracking-wide">
-                欢迎回来，李明杰！
+                欢迎回来，张晓航！
               </h2>
               <p className="text-xs text-slate-300 leading-relaxed">
                 今日建议优先完成【客舱紧急撤离演练】VR 实操课，已为您分配承德实训基地模拟客舱工位。
@@ -628,7 +644,13 @@ export default function App() {
             ].map(b => (
               <div
                 key={b.title}
-                onClick={() => alert(`【${b.title}】\n获得条件：${b.desc}\n状态：${b.earned ? '已获得' : '待解锁'}`)}
+                onClick={() => showAlert({
+                  title: b.title,
+                  icon: b.icon,
+                  tag: b.earned ? '深航荣誉勋章 · 已达成' : '深航荣誉勋章 · 待解锁',
+                  content: `获得条件：${b.desc}\n当前状态：${b.earned ? '已获得全部荣誉认证 ✓' : '继续完成实训任务即可点亮该勋章 🔒'}`,
+                  confirmText: '我知道了'
+                })}
                 className={`bg-white border rounded-2xl p-4 flex flex-col items-center justify-between text-center transition-all cursor-pointer shadow-2xs ${
                   b.earned ? 'border-[#EEF0F4] hover:border-[#E60026]' : 'border-[#EEF0F4] opacity-50'
                 }`}
@@ -697,7 +719,13 @@ export default function App() {
           </div>
           <div className="flex items-center gap-2.5">
             <button
-              onClick={() => alert('检测到承德基地实训工位 VR 设备：Pico 4 Pro 已联机')}
+              onClick={() => showAlert({
+                title: 'VR 实训设备联机检测',
+                icon: '🥽',
+                tag: '虚拟客舱实操中心',
+                content: '已检测到承德实训基地模拟客舱工位：\n【Pico 4 Pro 全景实操设备】已就绪，网络联机状态良好。',
+                confirmText: '确认并就绪'
+              })}
               className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold rounded-lg transition-colors cursor-pointer"
             >
               检测设备
@@ -1238,10 +1266,10 @@ export default function App() {
 
           <div className="flex items-center gap-2.5 pt-1">
             <div className="w-7 h-7 rounded-full bg-[#E60026] text-white flex items-center justify-center font-bold text-xs shrink-0">
-              李
+              张
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-bold text-white truncate">李明杰</p>
+              <p className="text-xs font-bold text-white truncate">张晓航</p>
               <p className="text-[10px] text-slate-400 truncate">ZH · 客舱服务部</p>
             </div>
           </div>
@@ -1255,7 +1283,13 @@ export default function App() {
 
       {/* Floating Question Help Circle (?) in bottom right */}
       <div
-        onClick={() => alert('深圳航空数字化学习中心 · 服务热线：400-777-9999\n当前版本：v2.4 (2026)')}
+        onClick={() => showAlert({
+          title: '深航飞飞 · 服务与支持',
+          icon: '✈️',
+          tag: '深圳航空数字化实训平台',
+          content: '深圳航空数字化学习中心 · 服务热线：400-777-9999\n当前运行版本：v2.4 (2026 深航定制正式版)',
+          confirmText: '确定'
+        })}
         className="fixed bottom-5 right-5 w-8 h-8 rounded-full bg-[#0B192C] hover:bg-[#E60026] text-white font-bold text-xs flex items-center justify-center shadow-lg cursor-pointer transition-colors z-40"
         title="帮助与支持"
       >
@@ -1300,10 +1334,16 @@ export default function App() {
                 onClick={() => {
                   setPoints(p => p + 120)
                   confetti({ particleCount: 70, spread: 60 })
-                  alert(`恭喜完成《${selectedCourse.title}》实训科目！已奖励 120 里程积分！`)
+                  showAlert({
+                    title: '实训科目顺利完成！',
+                    icon: '🎉',
+                    tag: '实操通关考核通过',
+                    content: `恭喜完成《${selectedCourse.title}》实训练习！\n已记入个人学时档案，并为您发放 +120 里程积分奖励！`,
+                    confirmText: '领取奖励并返回'
+                  })
                   setIsVRRunning(false)
                 }}
-                className="px-4 py-2 bg-[#E60026] hover:bg-[#CC0022] text-white text-xs font-bold rounded-lg cursor-pointer"
+                className="px-4 py-2 bg-[#E60026] hover:bg-[#CC0022] text-white text-xs font-bold rounded-lg cursor-pointer transition-colors shadow-xs"
               >
                 完成本次实训并结算积分
               </button>
@@ -1314,8 +1354,8 @@ export default function App() {
 
       {/* Document Reader Modal */}
       {selectedDoc && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-modalFadeIn">
+          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 space-y-4 transform animate-modalPop">
             <div className="flex items-start justify-between pb-3 border-b border-slate-100">
               <div className="space-y-1">
                 <div className="flex items-center gap-2 text-[10px] text-slate-400 font-medium">
@@ -1341,7 +1381,13 @@ export default function App() {
               <div className="flex items-center gap-2.5">
                 <button
                   onClick={() => {
-                    alert(`《${selectedDoc.title}》已成功缓存下载为离线受控 PDF 格式！`)
+                    showAlert({
+                      title: '受控规章下载成功',
+                      icon: '📥',
+                      tag: '离线规章缓存',
+                      content: `《${selectedDoc.title}》已成功缓存下载为离线受控 PDF 格式，支持弱网环境下随时翻阅研读。`,
+                      confirmText: '完成'
+                    })
                   }}
                   className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg cursor-pointer transition-colors"
                 >
@@ -1351,7 +1397,13 @@ export default function App() {
                   onClick={() => {
                     setPoints(p => p + 20)
                     confetti({ particleCount: 65, spread: 55, origin: { y: 0.6 } })
-                    alert(`完成《${selectedDoc.title}》阅读学习！\n已记录学时并奖励 +20 里程积分！`)
+                    showAlert({
+                      title: '规章研读认证完成',
+                      icon: '📖',
+                      tag: '合规实训学时',
+                      content: `完成《${selectedDoc.title}》阅读学习！\n已记录学时并为您发放 +20 里程积分奖励！`,
+                      confirmText: '领取积分'
+                    })
                     setSelectedDoc(null)
                   }}
                   className="px-4 py-1.5 bg-[#E60026] hover:bg-[#CC0022] text-white text-xs font-bold rounded-lg cursor-pointer transition-colors shadow-xs"
@@ -1366,8 +1418,8 @@ export default function App() {
 
       {/* Check-in Celebration Modal */}
       {isCheckinModalOpen && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-xs w-full p-6 text-center space-y-4 shadow-2xl border border-slate-200">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-modalFadeIn">
+          <div className="bg-white rounded-2xl max-w-xs w-full p-6 text-center space-y-4 shadow-2xl border border-slate-200 transform animate-modalPop">
             <div className="text-4xl">🔥</div>
             <div>
               <h3 className="text-base font-bold text-[#0B192C]">签到打卡成功！</h3>
@@ -1375,10 +1427,52 @@ export default function App() {
             </div>
             <button
               onClick={() => setIsCheckinModalOpen(false)}
-              className="w-full py-2 bg-[#E60026] hover:bg-[#CC0022] text-white text-xs font-bold rounded-lg cursor-pointer"
+              className="w-full py-2 bg-[#E60026] hover:bg-[#CC0022] text-white text-xs font-bold rounded-lg cursor-pointer transition-colors shadow-xs"
             >
               确定
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── 深航飞飞 · 全局美化自定义动画弹窗 ── */}
+      {customAlert && (
+        <div
+          className="fixed inset-0 bg-black/45 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-modalFadeIn"
+          onClick={() => setCustomAlert(null)}
+        >
+          <div
+            className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 text-center transform animate-modalPop space-y-4"
+            onClick={e => e.stopPropagation()}
+          >
+            {/* 头部图标徽标 */}
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-rose-50 to-orange-50 text-[#E60026] flex items-center justify-center text-3xl mx-auto shadow-inner border border-rose-100/80">
+              {customAlert.icon || '✈️'}
+            </div>
+
+            <div className="space-y-1.5">
+              {customAlert.tag && (
+                <span className="inline-block text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-rose-50 text-[#E60026] border border-rose-100">
+                  {customAlert.tag}
+                </span>
+              )}
+              <h3 className="text-base font-bold text-[#1E293B]">
+                {customAlert.title}
+              </h3>
+              <p className="text-xs text-slate-500 leading-relaxed whitespace-pre-line px-2">
+                {customAlert.content}
+              </p>
+            </div>
+
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={() => setCustomAlert(null)}
+                className="w-full py-2.5 rounded-xl text-xs font-bold text-white bg-[#E60026] hover:bg-[#CC0022] transition-colors cursor-pointer shadow-sm active:scale-98"
+              >
+                {customAlert.confirmText || '我知道了'}
+              </button>
+            </div>
           </div>
         </div>
       )}

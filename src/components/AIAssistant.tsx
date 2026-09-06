@@ -229,6 +229,8 @@ export default function AIAssistant({ onOpenDoc }: AIAssistantProps) {
     }
   }
 
+  const [isClearConfirmOpen, setIsClearConfirmOpen] = useState(false)
+
   const handleCopy = (text: string, idx: number) => {
     navigator.clipboard.writeText(text)
     setCopiedIdx(idx)
@@ -236,15 +238,18 @@ export default function AIAssistant({ onOpenDoc }: AIAssistantProps) {
   }
 
   const handleClearChat = () => {
-    if (confirm('确认清空当前所有对话记录吗？')) {
-      setMessages([
-        {
-          role: 'ai',
-          text: '对话记录已清空。您可以随时向我提问关于深航规章、SOP 标准流程与安全培训的任何问题。',
-          time: '刚刚'
-        }
-      ])
-    }
+    setIsClearConfirmOpen(true)
+  }
+
+  const confirmClearChat = () => {
+    setMessages([
+      {
+        role: 'ai',
+        text: '对话记录已清空。您可以随时向我提问关于深航规章、SOP 标准流程与安全培训的任何问题。',
+        time: '刚刚'
+      }
+    ])
+    setIsClearConfirmOpen(false)
   }
 
   const activeModelDisplay = serverConnected
@@ -290,7 +295,7 @@ export default function AIAssistant({ onOpenDoc }: AIAssistantProps) {
           <div key={idx} className={`flex gap-3.5 ${m.role === 'user' ? 'flex-row-reverse' : ''}`}>
             <div className={`w-8 h-8 rounded-xl shrink-0 flex items-center justify-center text-xs font-bold shadow-xs ${m.role === 'user' ? 'bg-[#E60026] text-white' : 'bg-[#0B192C] text-white'
               }`}>
-              {m.role === 'user' ? '李' : 'AI'}
+              {m.role === 'user' ? '张' : 'AI'}
             </div>
 
             <div className={`max-w-[84%] rounded-2xl p-4 text-[13px] leading-relaxed relative group ${m.role === 'user'
@@ -412,6 +417,39 @@ export default function AIAssistant({ onOpenDoc }: AIAssistantProps) {
           </button>
         )}
       </div>
+
+      {/* ── 清空对话自定义动画确认弹窗 ── */}
+      {isClearConfirmOpen && (
+        <div className="fixed inset-0 bg-black/45 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-modalFadeIn">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 space-y-4 text-center transform animate-modalPop">
+            <div className="w-12 h-12 rounded-2xl bg-rose-50 text-[#E60026] flex items-center justify-center text-2xl mx-auto shadow-inner border border-rose-100">
+              🗑️
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-[#1E293B]">清空当前对话记录？</h3>
+              <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
+                清空后，当前会话中的所有问答记录将被重置。此操作无法撤销。
+              </p>
+            </div>
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setIsClearConfirmOpen(false)}
+                className="flex-1 py-2 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer border border-slate-200"
+              >
+                取消
+              </button>
+              <button
+                type="button"
+                onClick={confirmClearChat}
+                className="flex-1 py-2 rounded-xl text-xs font-bold text-white bg-[#E60026] hover:bg-[#CC0022] transition-colors cursor-pointer shadow-xs"
+              >
+                确认清空
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
