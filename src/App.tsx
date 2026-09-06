@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import confetti from 'canvas-confetti'
 import EntranceScreen from './components/EntranceScreen'
+import AIAssistant from './components/AIAssistant'
 
 type Page = 'home' | 'points' | 'ai' | 'vr' | 'knowledge' | 'leaderboard'
 
@@ -335,7 +336,7 @@ const LEADERBOARD_USERS = [
   { rank: 7, name: '赵诗涵', dept: '乘务二队', avatar: '赵', points: 8340, streak: 14, change: -2 },
 ]
 
-type ChatMsg = { role: 'user' | 'ai'; text: string; time: string; refDoc?: string }
+type ChatMsg = { role: 'user' | 'ai'; text: string; time: string; refDoc?: string; isStreaming?: boolean }
 
 // ── Main Shell ──────────────────────────────────────────────────────────────
 
@@ -1121,127 +1122,15 @@ export default function App() {
     )
   }
 
-  // ── Page 6: AI 飞行助手 (Clean Chatbot) ────────────────────────────────────
+  // ── Page 6: AI 飞行助手 (流式输出 + 通义千问 Qwen 后端连接) ─────────────────
   function AIPage() {
-    const [messages, setMessages] = useState<ChatMsg[]>([
-      { role: 'ai', text: '您好，李明杰！我是深圳航空专属 AI 伴学助手。您可以向我咨询《深圳航空服务标准手册》、应急撤离 SOP、服务礼仪或进行模拟问答。', time: '刚刚' }
-    ])
-    const [query, setQuery] = useState('')
-    const [loading, setLoading] = useState(false)
-    const chatEndRef = useRef<HTMLDivElement>(null)
-
-    useEffect(() => {
-      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-    }, [messages])
-
-    const handleSend = (textToSend?: string) => {
-      const q = (textToSend || query).trim()
-      if (!q || loading) return
-      const now = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
-      setMessages(m => [...m, { role: 'user', text: q, time: now }])
-      if (!textToSend) setQuery('')
-      setLoading(true)
-
-      setTimeout(() => {
-        let answer = '根据《深圳航空乘务员服务操作手册》2024版规程，请务必严格遵照标准程序执行。您还可以查阅左侧知识库获取受控原文。'
-        let ref = ''
-
-        if (q.includes('撤离') || q.includes('应急') || q.includes('客舱')) {
-          answer = '【客舱紧急撤离规程】\n1. 听到机长指令“撤离！撤离！”后，立即开启对应应急舱门并确认滑梯充气膨胀正常。\n2. 疏散口令标准用语：“松开安全带！抛弃所有行李！脱掉高跟鞋！往这边跑！”\n3. 确认所有区域旅客撤离完毕后，乘务长携带应急物资最后离机。'
-          ref = '深圳航空服务标准手册 (2024版)'
-        } else if (q.includes('礼仪') || q.includes('服务') || q.includes('问候')) {
-          answer = '【服务礼仪规范】\n乘务员迎客时保持 15° 鞠躬，右手自然叠放在左手之上置于腹前；递送饮品时需使用托盘，热饮装杯不超过 70%，并温馨提示“请小心烫”。'
-          ref = '跨文化服务礼仪：国际航线乘客沟通'
-        } else if (q.includes('计划') || q.includes('学习')) {
-          answer = '为您规划本周实训节奏：\n• 周一/周三：客舱安全法规与理论测验\n• 周二/周四：VR 紧急撤离与机舱巡视实操演练\n• 周五/周末：知识库深读与每周排行榜冲刺！'
-        }
-
-        setMessages(m => [...m, { role: 'ai', text: answer, time: now, refDoc: ref || undefined }])
-        setLoading(false)
-      }, 650)
-    }
-
     return (
-      <div className="flex flex-col h-full p-8 max-w-3xl mx-auto">
-        <div className="flex items-center gap-3 mb-5 pb-3 border-b border-slate-200">
-          <div className="w-9 h-9 rounded-xl bg-[#E60026] text-white flex items-center justify-center font-bold text-sm shadow-xs">
-            ✦
-          </div>
-          <div>
-            <h1 className="text-lg font-bold text-[#0B192C]">AI 飞行助手</h1>
-            <p className="text-[11px] text-slate-400">深圳航空知识库伴学模型 · 实时在线</p>
-          </div>
-        </div>
-
-        <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-1">
-          {messages.map((m, idx) => (
-            <div key={idx} className={`flex gap-3 ${m.role === 'user' ? 'flex-row-reverse' : ''}`}>
-              <div className={`w-7 h-7 rounded-lg shrink-0 flex items-center justify-center text-[10px] font-bold ${
-                m.role === 'user' ? 'bg-[#E60026] text-white' : 'bg-[#0B192C] text-white'
-              }`}>
-                {m.role === 'user' ? '李' : 'AI'}
-              </div>
-              <div className={`max-w-[80%] rounded-2xl p-3.5 text-xs leading-relaxed ${
-                m.role === 'user'
-                  ? 'bg-[#E60026] text-white rounded-tr-xs'
-                  : 'bg-white border border-[#EEF0F4] text-slate-800 rounded-tl-xs shadow-2xs whitespace-pre-line'
-              }`}>
-                {m.text}
-                {m.refDoc && (
-                  <div
-                    onClick={() => {
-                      const found = KNOWLEDGE_DOCS.find(d => d.title.includes(m.refDoc!))
-                      if (found) setSelectedDoc(found)
-                    }}
-                    className="mt-2.5 pt-2 border-t border-slate-100 text-[10px] text-[#E60026] font-bold flex items-center gap-1 cursor-pointer hover:underline"
-                  >
-                    <span>📖 参考依据：{m.refDoc}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
-
-          {loading && (
-            <div className="flex items-center gap-2 text-xs text-slate-400 bg-white border border-slate-200 px-3 py-2 rounded-xl w-fit">
-              <span className="animate-spin">⏳</span>
-              <span>深航 AI 助手正在检索官方规章...</span>
-            </div>
-          )}
-          <div ref={chatEndRef} />
-        </div>
-
-        {/* Suggestion Prompts */}
-        <div className="flex gap-2 flex-wrap mb-3">
-          {['客舱紧急撤离程序要点', '服务礼仪与问候规范', '机上医疗急救流程', '制定本周学习计划'].map(s => (
-            <button
-              key={s}
-              onClick={() => handleSend(s)}
-              className="text-xs text-[#E60026] bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-full font-medium transition-colors cursor-pointer"
-            >
-              {s}
-            </button>
-          ))}
-        </div>
-
-        {/* Chat Input */}
-        <div className="flex gap-2 bg-white border border-[#EEF0F4] rounded-xl p-1.5 focus-within:border-[#E60026] transition-colors shadow-2xs">
-          <input
-            className="flex-1 px-3 py-2 text-xs text-slate-800 outline-none bg-transparent placeholder:text-slate-400"
-            placeholder="输入您要咨询的专业问题（如：紧急撤离口令、餐食服务规范）..."
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleSend()}
-          />
-          <button
-            onClick={() => handleSend()}
-            disabled={!query.trim() || loading}
-            className="bg-[#E60026] hover:bg-[#CC0022] disabled:opacity-40 text-white text-xs px-4 py-2 rounded-lg font-bold transition-colors cursor-pointer"
-          >
-            发送
-          </button>
-        </div>
-      </div>
+      <AIAssistant
+        onOpenDoc={(title) => {
+          const found = KNOWLEDGE_DOCS.find(d => d.title.includes(title))
+          if (found) setSelectedDoc(found)
+        }}
+      />
     )
   }
 
