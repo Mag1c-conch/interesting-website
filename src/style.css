@@ -293,3 +293,73 @@ html, body, #root {
   animation: modalFadeIn 0.2s ease-out forwards;
 }
 
+/* ── Feifei Airplane Mascot & 3D Stage Animations ── */
+@keyframes feifeiFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(2.5deg);
+  }
+}
+
+@keyframes feifeiShadow {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.35;
+  }
+  50% {
+    transform: scale(0.82);
+    opacity: 0.18;
+  }
+}
+
+@keyframes radarSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes speechBubbleBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes holographicPulse {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1.05);
+  }
+}
+
+.animate-feifei-float {
+  animation: feifeiFloat 3.4s ease-in-out infinite;
+}
+
+.animate-feifei-shadow {
+  animation: feifeiShadow 3.4s ease-in-out infinite;
+}
+
+.animate-radar-spin {
+  animation: radarSpin 14s linear infinite;
+}
+
+.animate-speech-bubble {
+  animation: speechBubbleBounce 2.8s ease-in-out infinite;
+}
+
+.animate-holographic-pulse {
+  animation: holographicPulse 2.4s ease-in-out infinite;
+}
+
