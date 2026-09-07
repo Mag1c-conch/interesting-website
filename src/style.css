@@ -44,27 +44,72 @@ html, body, #root {
 }
 
 /* ── Entrance Screen Keyframes ── */
-@keyframes flightCruise {
+@keyframes flightCruiseLinear {
   0% {
-    transform: translate(-25vw, 20px) rotate(1deg);
-  }
-  25% {
-    transform: translate(12vw, -15px) rotate(2.5deg);
-  }
-  50% {
-    transform: translate(50vw, 12px) rotate(0.5deg);
-  }
-  75% {
-    transform: translate(88vw, -12px) rotate(2deg);
+    transform: translateX(-560px);
   }
   100% {
-    transform: translate(125vw, 18px) rotate(1deg);
+    transform: translateX(calc(100vw + 160px));
+  }
+}
+
+@keyframes flightGentleFloat {
+  0% {
+    transform: translateY(-5px) rotate(0.6deg);
+  }
+  50% {
+    transform: translateY(6px) rotate(1.6deg);
+  }
+  100% {
+    transform: translateY(-5px) rotate(0.6deg);
+  }
+}
+
+@keyframes contrailPulse {
+  0%, 100% {
+    opacity: 0.75;
+    transform: scaleY(1);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scaleY(1.3);
+  }
+}
+
+@keyframes beaconBlink {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.2;
+    transform: scale(0.6);
+  }
+}
+
+@keyframes windowTwinkle {
+  0%, 100% {
+    opacity: 0.95;
+  }
+  50% {
+    opacity: 0.35;
   }
 }
 
 @keyframes cloudDriftSlow {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
+}
+
+@keyframes waterShimmer {
+  0%, 100% {
+    opacity: 0.7;
+    transform: scaleY(1);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scaleY(1.08);
+  }
 }
 
 @keyframes starTwinkle {
@@ -246,5 +291,75 @@ html, body, #root {
 
 .animate-modalFadeIn {
   animation: modalFadeIn 0.2s ease-out forwards;
+}
+
+/* ── Feifei Airplane Mascot & 3D Stage Animations ── */
+@keyframes feifeiFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(2.5deg);
+  }
+}
+
+@keyframes feifeiShadow {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.35;
+  }
+  50% {
+    transform: scale(0.82);
+    opacity: 0.18;
+  }
+}
+
+@keyframes radarSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes speechBubbleBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes holographicPulse {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1.05);
+  }
+}
+
+.animate-feifei-float {
+  animation: feifeiFloat 3.4s ease-in-out infinite;
+}
+
+.animate-feifei-shadow {
+  animation: feifeiShadow 3.4s ease-in-out infinite;
+}
+
+.animate-radar-spin {
+  animation: radarSpin 14s linear infinite;
+}
+
+.animate-speech-bubble {
+  animation: speechBubbleBounce 2.8s ease-in-out infinite;
+}
+
+.animate-holographic-pulse {
+  animation: holographicPulse 2.4s ease-in-out infinite;
 }
 
