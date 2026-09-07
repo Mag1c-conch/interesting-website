@@ -478,17 +478,26 @@ export default function App() {
   const [points, setPoints] = useState(8760)
   const [streakDays, setStreakDays] = useState(18)
   const [checkedInToday, setCheckedInToday] = useState(false)
+  const [isVRRunning, setIsVRRunning] = useState(false)
+  const [isVRVideoPlaying, setIsVRVideoPlaying] = useState(false)
 
-  // Listen to Esc key to return to entrance screen for PPT demonstrations
+  // Listen to Esc key to close VR video/modal first, or return to entrance screen
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !showEntrance) {
-        setShowEntrance(true)
+      if (e.key === 'Escape') {
+        if (isVRRunning) {
+          setIsVRRunning(false)
+          setIsVRVideoPlaying(false)
+          return
+        }
+        if (!showEntrance) {
+          setShowEntrance(true)
+        }
       }
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [showEntrance])
+  }, [showEntrance, isVRRunning])
 
   const handleEnterPlatform = () => {
     setShowEntrance(false)
@@ -500,7 +509,6 @@ export default function App() {
   const [selectedCourse, setSelectedCourse] = useState<CourseItem | null>(null)
   const [selectedDoc, setSelectedDoc] = useState<KnowledgeDoc | null>(null)
   const [isCheckinModalOpen, setIsCheckinModalOpen] = useState(false)
-  const [isVRRunning, setIsVRRunning] = useState(false)
   const [customAlert, setCustomAlert] = useState<{
     title: string
     content: string
@@ -1687,108 +1695,129 @@ export default function App() {
         </div>
 
         {/* ── Interactive Modals ── */}
-        {/* VR Content Video Player Modal (大窗口/全屏沉浸式播放器) */}
+        {/* ── Interactive Modals ── */}
+        {/* VR Content Video Player Modal (进入确认 + 超大无控件全景沉浸式播放) */}
         {isVRRunning && selectedCourse && (
-          <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4 lg:p-8 animate-modalFadeIn">
-            <div className="bg-[#0B1320] rounded-2xl max-w-5xl w-full text-white p-5 space-y-4 border border-slate-700/80 shadow-2xl animate-modalPop flex flex-col max-h-[95vh]">
-              {/* Header */}
-              <div className="flex items-center justify-between pb-3 border-b border-slate-800 shrink-0">
-                <div className="flex items-center gap-2.5">
-                  <span className="text-[10px] font-bold px-2.5 py-0.5 rounded bg-[#E60026] text-white tracking-wider shadow-xs flex items-center gap-1">
-                    <span>▶</span> VR 沉浸实操视频
-                  </span>
-                  <h3 className="font-bold text-base text-white">{selectedCourse.title}</h3>
-                  <span className="text-[11px] text-slate-400 border border-slate-700 px-2.5 py-0.5 rounded-full">
-                    {selectedCourse.dept} · {selectedCourse.roleName} 教官
-                  </span>
-                </div>
-                <button
-                  onClick={() => setIsVRRunning(false)}
-                  className="text-slate-400 hover:text-white cursor-pointer text-xl w-8 h-8 rounded-lg hover:bg-white/10 flex items-center justify-center transition-colors"
-                  title="关闭视频"
-                >
-                  ✕
-                </button>
-              </div>
-
-              {/* 16:9 Cinema Video Container */}
-              <div className="relative w-full aspect-video bg-black rounded-xl overflow-hidden border border-slate-800 shadow-2xl flex items-center justify-center shrink-0">
-                {selectedCourse.videoUrl ? (
-                  <video
-                    key={selectedCourse.id}
-                    src={selectedCourse.videoUrl}
-                    controls
-                    autoPlay
-                    playsInline
-                    className="w-full h-full object-contain bg-black"
-                  />
-                ) : (
-                  <div className="text-center p-8 space-y-3">
-                    <div className="text-4xl">🎬</div>
-                    <p className="font-bold text-white text-sm">《{selectedCourse.title}》VR 内容视频正在录制筹备中</p>
-                    <p className="text-xs text-slate-400 max-w-md mx-auto">
-                      目前第一个方片《客舱紧急撤离与释压全景演练》已加载实操视频。您可以点击下方直接播放演示视频：
-                    </p>
+          <>
+            {/* Stage 1: 课前进入确认与教官指引弹窗 */}
+            {!isVRVideoPlaying ? (
+              <div className="fixed inset-0 bg-black/75 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-modalFadeIn">
+                <div className="bg-[#0B1320] rounded-2xl max-w-lg w-full text-white p-6 space-y-5 border border-slate-700/80 shadow-2xl animate-modalPop">
+                  {/* Header */}
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-bold px-2.5 py-0.5 rounded bg-[#E60026] text-white tracking-wider">
+                        VR 模块准备就绪
+                      </span>
+                      <span className="text-[11px] text-slate-400 border border-slate-700 px-2 py-0.5 rounded">
+                        {selectedCourse.dept}
+                      </span>
+                    </div>
                     <button
                       onClick={() => {
-                        setSelectedCourse({ ...selectedCourse, videoUrl: vrEmergencyEvacuationVideo })
+                        setIsVRRunning(false)
+                        setIsVRVideoPlaying(false)
                       }}
-                      className="px-4 py-2 bg-[#E60026] hover:bg-[#CC0022] text-white text-xs font-bold rounded-lg cursor-pointer transition-colors shadow-md inline-flex items-center gap-1.5"
+                      className="text-slate-400 hover:text-white cursor-pointer text-lg w-7 h-7 rounded-lg hover:bg-white/10 flex items-center justify-center transition-colors"
+                      title="关闭"
                     >
-                      <span>▶</span>
-                      <span>播放演示实训视频</span>
+                      ✕
                     </button>
                   </div>
-                )}
-              </div>
 
-              {/* Footer: Instructor Guidance & Points Settlement */}
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-1 border-t border-slate-800/80 shrink-0">
-                <div className="flex items-center gap-3 min-w-0 flex-1">
-                  <div className="w-10 h-10 shrink-0 rounded-xl bg-slate-900 border border-slate-700 p-0.5 flex items-center justify-center">
-                    <img
-                      src={selectedCourse.img}
-                      alt={selectedCourse.roleName}
-                      className="w-full h-full object-contain filter drop-shadow-xs"
-                    />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[11px] font-bold text-amber-400">{selectedCourse.roleName} 教官</span>
-                      <span className="text-[10px] text-slate-400">{selectedCourse.roleTitle}</span>
+                  {/* Course Title & IP Instructor */}
+                  <div className="flex items-start gap-4">
+                    <div className="w-16 h-16 shrink-0 rounded-2xl bg-gradient-to-b from-slate-800 to-slate-900 border border-slate-700 p-1 flex items-center justify-center shadow-md">
+                      <img
+                        src={selectedCourse.img}
+                        alt={selectedCourse.roleName}
+                        className="w-full h-full object-contain filter drop-shadow-md"
+                      />
                     </div>
-                    <p className="text-xs text-slate-300 italic truncate mt-0.5">
-                      {selectedCourse.instructorTip}
-                    </p>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-bold text-base text-white leading-snug">{selectedCourse.title}</h3>
+                      <p className="text-xs text-amber-400 font-semibold mt-1">
+                        特聘教官：{selectedCourse.roleName}（{selectedCourse.roleTitle}）
+                      </p>
+                      <p className="text-[11px] text-slate-300 mt-1 line-clamp-2 leading-relaxed">
+                        {selectedCourse.desc}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Instructor Tip Speech Box */}
+                  <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800/90 text-xs text-slate-200 italic leading-relaxed flex items-start gap-2.5">
+                    <span className="text-amber-400 text-sm shrink-0">💬</span>
+                    <span>{selectedCourse.instructorTip}</span>
+                  </div>
+
+                  {/* Specs */}
+                  <div className="grid grid-cols-3 gap-2 py-2 border-y border-slate-800 text-center text-xs">
+                    <div>
+                      <span className="text-[10px] text-slate-400 block">科目学时</span>
+                      <span className="font-bold text-white mt-0.5 block">{selectedCourse.duration}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-400 block">已受训</span>
+                      <span className="font-bold text-white mt-0.5 block">{selectedCourse.users}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-400 block">考核通关</span>
+                      <span className="font-bold text-emerald-400 mt-0.5 block">{selectedCourse.pts}</span>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex items-center justify-end gap-3 pt-1">
+                    <button
+                      onClick={() => {
+                        setIsVRRunning(false)
+                        setIsVRVideoPlaying(false)
+                      }}
+                      className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition-colors cursor-pointer"
+                    >
+                      返回
+                    </button>
+                    <button
+                      onClick={() => setIsVRVideoPlaying(true)}
+                      className="px-7 py-2.5 bg-[#E60026] hover:bg-[#CC0022] text-white text-sm font-bold rounded-xl transition-all cursor-pointer shadow-lg hover:shadow-rose-900/50 flex items-center gap-2 active:scale-98"
+                    >
+                      <span>▶</span>
+                      <span>进入</span>
+                    </button>
                   </div>
                 </div>
+              </div>
+            ) : (
+              /* Stage 2: 纯净沉浸式超大无控件模拟器（零播放器UI，最大化全屏画面，按ESC或点叉退出） */
+              <div className="fixed inset-0 z-50 bg-black flex items-center justify-center animate-modalFadeIn select-none overflow-hidden">
+                {/* 悬浮右上角点叉退出按钮 (按 ESC 或点叉即可退出) */}
+                <button
+                  onClick={() => {
+                    setIsVRRunning(false)
+                    setIsVRVideoPlaying(false)
+                  }}
+                  className="absolute top-5 right-6 z-50 px-3.5 py-1.5 rounded-full bg-black/60 hover:bg-[#E60026] text-white/90 hover:text-white text-xs font-bold backdrop-blur-md border border-white/20 shadow-2xl transition-all cursor-pointer flex items-center gap-2 group"
+                  title="点击或按 ESC 退出"
+                >
+                  <span className="text-sm leading-none font-bold group-hover:rotate-90 transition-transform">✕</span>
+                  <span className="text-[11px] text-slate-300 group-hover:text-white">退出 (ESC)</span>
+                </button>
 
-                <div className="flex items-center gap-3 shrink-0">
-                  <span className="text-xs text-slate-400">
-                    科目加分：<strong className="text-amber-400 font-mono">{selectedCourse.pts}</strong>
-                  </span>
-                  <button
-                    onClick={() => {
-                      setPoints(p => p + 120)
-                      confetti({ particleCount: 75, spread: 65 })
-                      showAlert({
-                        title: '实训科目顺利完成！',
-                        icon: '🎉',
-                        tag: '实操通关考核通过',
-                        content: `恭喜观摩并完成《${selectedCourse.title}》实训练习！\n已记入个人学时档案，并为您发放 ${selectedCourse.pts} 里程积分奖励！`,
-                        confirmText: '领取奖励并返回'
-                      })
-                      setIsVRRunning(false)
-                    }}
-                    className="px-5 py-2.5 bg-[#E60026] hover:bg-[#CC0022] text-white text-xs font-bold rounded-xl cursor-pointer transition-colors shadow-md flex items-center gap-1.5 active:scale-98"
-                  >
-                    <span>✓</span>
-                    <span>完成本次实训并结算积分</span>
-                  </button>
+                {/* 最大化全屏沉浸画面（完全隐藏所有原生播放器控件与进度条，看起来像真机实操系统） */}
+                <div className="w-full h-full flex items-center justify-center bg-black">
+                  <video
+                    key={selectedCourse.id}
+                    src={selectedCourse.videoUrl || vrEmergencyEvacuationVideo}
+                    autoPlay
+                    loop
+                    playsInline
+                    className="w-full h-full object-contain pointer-events-none"
+                  />
                 </div>
               </div>
-            </div>
-          </div>
+            )}
+          </>
         )}
 
         {/* Document Reader Modal */}
